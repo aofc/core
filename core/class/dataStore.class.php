@@ -113,7 +113,7 @@ class dataStore {
 	}
 
 	public function postSave() {
-		scenario::check('variable(' . $this->getKey().')');
+		scenario::check('variable(' . $this->getKey().')', false, null, null, $this->getValue());
 		$value_cmd =	cmd::byValue('variable(' . $this->getKey(), null, true);
 		if (is_array($value_cmd)) {
 			foreach ($value_cmd as $cmd) {
