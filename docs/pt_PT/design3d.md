@@ -4,7 +4,7 @@
 Esta página permite criar uma visualização em 3D da sua casa que pode reagir dependendo do estado das várias informações na sua automação residencial.
 
 
-> **Dica**
+> **Conselho**
 >
 > É possível ir diretamente para um design 3D graças ao submenu.
 
@@ -20,15 +20,15 @@ Depois que seu modelo 3D for criado, ele deverá ser exportado no formato OBJ. S
 >
 > Os arquivos devem estar na raiz do zip e não em uma subpasta.
 
-> **AVISO**
+> **ATENÇÃO**
 >
-> Um modelo 3D é bastante imponente (isso pode representar várias centenas de Mo). Quanto maior, maior o tempo de renderização no Jeedom.
+> Um modelo 3D é bastante grande (pode representar várias centenas de MB). Quanto maior, maior o tempo de renderização no Jeedom.
 
-Após a exportação do seu modelo 3D, você deve criar um novo design 3D no Jeedom. Para isso, é necessário entrar no modo de edição, clicando no pequeno lápis à direita, depois clique no +, dê um nome a este novo design 3D e valide.
+Depois que seu modelo 3D for exportado, no Jeedom você deverá criar um novo design 3D. Para fazer isso, você deve entrar no modo de edição clicando no pequeno lápis à direita, depois clicar no +, dar um nome a este novo desenho 3D e validar.
 
 Jeedom mudará automaticamente para o novo design 3D, você deve retornar ao modo de edição e clicar nas pequenas rodas dentadas.
 
-Você pode nessa tela :
+Nesta tela você pode :
 
 - Mude o nome do seu design
 - Adicione um código de acesso
@@ -37,15 +37,15 @@ Você pode nessa tela :
 
 Clique no botão "enviar" no nível "Modelo 3D" e selecione seu arquivo zip
 
-> **AVISO**
+> **ATENÇÃO**
 >
 > Jeedom autoriza a importação de um arquivo de 150mo no máximo !
 
-> **AVISO**
+> **ATENÇÃO**
 >
 > Você deve ter um arquivo zip.
 
-> **Dica**
+> **Conselho**
 >
 > Depois que o arquivo for importado (pode ser bastante longo, dependendo do tamanho do arquivo), você precisará atualizar a página para ver o resultado (F5).
 
@@ -60,12 +60,12 @@ Para configurar um elemento no design 3D, clique duas vezes no elemento que voc�
 
 - Indique um tipo de link (atualmente apenas o equipamento existe)
 - Digite o link para o elemento em questão. Aqui você só pode colocar um link para um dispositivo no momento. Isso permite ao clicar no item para abrir o equipamento
-- Definir especificidade: existem vários que veremos logo depois, isso permite especificar o tipo de equipamento e, portanto, a exibição de informações
+- Definir especificidade : existem vários que veremos logo depois, isso permite especificar o tipo de equipamento e, portanto, a exibição de informações
 
 ### Luz
 
 - Status : O controle do status da luz pode ser binário (0 ou 1), digital (0 a 100%) ou colorido
-- Poderoso : potência da lâmpada (observe que isso pode não refletir a realidade))
+- Poder : potência da lâmpada (observe que isso pode não refletir a realidade))
 
 ### Texte
 
@@ -85,23 +85,23 @@ Para configurar um elemento no design 3D, clique duas vezes no elemento que voc�
 
 - Estado : Status da porta / janela, 1 fechado e 0 aberto
 - Rotation
-	- Permitir : ativa a rotação da porta / janela ao abrir
+	- Habilitar : ativa a rotação da porta / janela ao abrir
 	- Abertura : o melhor é testar para que ele corresponda à sua porta / janela
 - Translation
-	- Permitir : ativa a tradução ao abrir (porta deslizante / janela))
-	- Significado : direção na qual a porta / janela deve se mover (você tem para cima / baixo / direita / esquerda)
+	- Habilitar : ativa a tradução ao abrir (porta deslizante / janela))
+	- Senso : direção na qual a porta / janela deve se mover (você tem para cima / baixo / direita / esquerda)
 	- Repetir : por padrão, a porta / janela se move uma vez sua dimensão na direção especificada, mas você pode aumentar esse valor
 - Ocultar quando a porta / janela está aberta
-	- Permitir : Oculta o elemento se a Porta / Janela estiver aberta
+	- Habilitar : Oculta o elemento se a Porta / Janela estiver aberta
 - Couleur
 	- Cor aberta : se assinalar, o elemento assumirá esta cor se a porta / janela estiver aberta
 	- Cor fechada : se marque o elemento terá esta cor se a porta / janela estiver fechada
 
 #### Volet
 
-- Estado : status do obturador, 0 aberto outro valor fechado
+- Estado : status do obturador, 0 aberto e outro valor fechado
 - Ocultar quando o obturador estiver aberto
-	- Permitir : ocultar o elemento se o obturador estiver aberto
+	- Habilitar : ocultar o elemento se o obturador estiver aberto
 - Couleur
 	- Cor fechada : se marque o elemento terá esta cor se o obturador estiver fechado
 
@@ -109,6 +109,6 @@ Para configurar um elemento no design 3D, clique duas vezes no elemento que voc�
 
 Se a condição for válida, permite atribuir a cor escolhida ao elemento. Você pode colocar quantas cores / condições desejar.
 
-> **Dica**
+> **Conselho**
 >
 > As condições são avaliadas em ordem; a primeira, verdadeira, será adotada; as seguintes, portanto, não serão avaliadas

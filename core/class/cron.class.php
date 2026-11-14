@@ -323,13 +323,13 @@ class cron {
 			if ($this->getPID() > 0) {
 				system::kill($this->getPID());
 				$retry = 0;
-				while ($this->running() && $retry < (config::byKey('deamonsSleepTime') + 5)) {
+				while ($this->running() && $retry < ( (int)(config::byKey('deamonsSleepTime')) + 5) ) {
 					sleep(1);
 					system::kill($this->getPID());
 					$retry++;
 				}
 				$retry = 0;
-				while ($this->running() && $retry < (config::byKey('deamonsSleepTime') + 5)) {
+				while ($this->running() && $retry < ( (int)(config::byKey('deamonsSleepTime')) + 5) ) {
 					sleep(1);
 					system::kill($this->getPID());
 					$retry++;
@@ -359,46 +359,14 @@ class cron {
 	* Check if it's time to launch cron
 	* @return boolean
 	*/
-	public function isDue() {
-		if(((new DateTime('today midnight +1 day'))->format('I') - (new DateTime('today midnight'))->format('I')) == -1 && date('I') == 1 && date('Gi') > 159) {
-			return false;
-		}
+	public function isDue($_datetime = null) {
 		//check if already sent on that minute
 		$last = strtotime($this->getLastRun());
 		$now = time();
-		$now = ($now - $now % 60);
-		$last = ($last - $last % 60);
-		if ($now == $last) {
+		if (($now - $now % 60) == ($last - $last % 60)) {
 			return false;
 		}
-		try {
-			$c = new Cron\CronExpression(checkAndFixCron($this->getSchedule()), new Cron\FieldFactory);
-			try {
-				if ($c->isDue()) {
-					return true;
-				}
-			} catch (Exception $e) {
-
-			} catch (Error $e) {
-
-			}
-			try {
-				$prev = $c->getPreviousRunDate()->getTimestamp();
-			} catch (Exception $e) {
-				return false;
-			} catch (Error $e) {
-				return false;
-			}
-			$diff = abs((strtotime('now') - $prev) / 60);
-			if (strtotime($this->getLastRun()) < $prev && ($diff <= config::byKey('maxCatchAllow') || config::byKey('maxCatchAllow') == -1)) {
-				return true;
-			}
-		} catch (Exception $e) {
-			log::add('cron', 'debug', 'Error on isDue : ' . $e->getMessage() . ', cron : ' . $this->getSchedule());
-		} catch (Error $e) {
-			log::add('cron', 'debug', 'Error on isDue : ' . $e->getMessage() . ', cron : ' . $this->getSchedule());
-		}
-		return false;
+		return cronIsDue($this->getSchedule(),$_datetime);
 	}
 
 	public function getNextRunDate() {
@@ -551,7 +519,7 @@ class cron {
 	}
 
 	public function getOption() {
-		return json_decode($this->option, true);
+		return json_decode($this->option ?? '', true);
 	}
 
 	public function getOnce($_default = 0) {

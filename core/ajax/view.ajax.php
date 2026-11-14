@@ -58,6 +58,7 @@ try {
 	}
 
 	if (init('action') == 'all') {
+		$return = array();
 		$views = view::all();
 		foreach ($views as $view) {
 			if (!$view->hasRight('r')) {
@@ -170,6 +171,7 @@ try {
 			}
 			$sql .= 'UPDATE viewData SET `order`= ' . $component['viewOrder'] . '  WHERE link_id=' . $component['id'] . ' AND type="' . $component['type'] . '" AND  viewZone_id=' . $component['viewZone_id'] . ';';
 			if ($component['type'] == 'eqLogic') {
+				unset($component['type']);
 				$eqLogic = eqLogic::byId($component['id']);
 				if (!is_object($eqLogic)) {
 					continue;
@@ -177,6 +179,7 @@ try {
 				utils::a2o($eqLogic, $component);
 				$eqLogic->save(true);
 			} elseif ($component['type'] == 'scenario') {
+				unset($component['type']);
 				$scenario = scenario::byId($component['id']);
 				if (!is_object($scenario)) {
 					continue;

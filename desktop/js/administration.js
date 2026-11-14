@@ -283,24 +283,6 @@ if (!jeeFrontEnd.administration) {
           })
         },
         success: function(data) {
-          jeeP.updateCacheStats()
-          jeedomUtils.showAlert({
-            message: '{{Cache vidé}}',
-            level: 'success'
-          })
-        }
-      })
-    },
-    flushWidgetCache: function() {
-      jeedom.cache.flushWidget({
-        error: function(error) {
-          jeedomUtils.showAlert({
-            message: error.message,
-            level: 'danger'
-          })
-        },
-        success: function(data) {
-          jeeP.updateCacheStats()
           jeedomUtils.showAlert({
             message: '{{Cache vidé}}',
             level: 'success'
@@ -317,24 +299,10 @@ if (!jeeFrontEnd.administration) {
           })
         },
         success: function(data) {
-          jeeP.updateCacheStats()
           jeedomUtils.showAlert({
             message: '{{Cache nettoyé}}',
             level: 'success'
           })
-        }
-      })
-    },
-    updateCacheStats: function() {
-      jeedom.cache.stats({
-        error: function(error) {
-          jeedomUtils.showAlert({
-            message: error.message,
-            level: 'danger'
-          })
-        },
-        success: function(data) {
-          document.getElementById('span_cacheObject').innerHTML = data.count
         }
       })
     },
@@ -937,6 +905,24 @@ document.getElementById('logtab').addEventListener('click', function(event) {
     return
   }
 
+  if (_target = event.target.closest('#bt_removeTimelineFuturEvent')) {
+    jeedom.timeline.removeEventInFutur({
+      error: function(error) {
+        jeedomUtils.showAlert({
+          message: error.message,
+          level: 'danger'
+        })
+      },
+      success: function(data) {
+        jeedomUtils.showAlert({
+          message: '{{Evènements de la timeline dans le futur supprimés avec succès}}',
+          level: 'success'
+        })
+      }
+    })
+    return
+  }
+
   if (_target = event.target.closest('.bt_addActionOnMessage')) {
     jeeP.addActionOnMessage({}, _target.getAttribute('data-channel'))
     jeeFrontEnd.modifyWithoutSave = true
@@ -1170,6 +1156,25 @@ document.getElementById('eqlogictab').addEventListener('click', function(event) 
     })
     return
   }
+
+  if (_target = event.target.closest('#bt_removeHistoryInFutur')) {
+    jeedom.history.removeHistoryInFutur({
+      error: function(error) {
+        jeedomUtils.showAlert({
+          message: error.message,
+          level: 'danger'
+        })
+      },
+      success: function(data) {
+        jeedomUtils.showAlert({
+          message: '{{Historique dans le futur supprimés avec succès}}',
+          level: 'success'
+        })
+      }
+    })
+    return
+  }
+
 })
 
 
@@ -1333,6 +1338,20 @@ document.getElementById('updatetab').addEventListener('click', function(event) {
     return
   }
 
+  if (_target = event.target.closest('#bt_refreshListBranch')) {
+    jeedom.cache.remove({
+      key: 'core::branch::default::list',
+      error: function(error) {
+        jeedomUtils.showAlert({
+          message: error.message,
+          level: 'danger'
+        })
+      },
+      success: function(data) {
+        window.location.reload();
+      }
+    })
+  }
 })
 
 document.getElementById('updatetab').addEventListener('change', function(event) {
@@ -1366,12 +1385,6 @@ document.getElementById('cachetab').addEventListener('click', function(event) {
         jeeP.flushCache()
       }
     })
-    return
-  }
-
-  if (_target = event.target.closest('#bt_flushWidgetCache')) {
-    jeedomUtils.hideAlert()
-    jeeP.flushWidgetCache()
     return
   }
 })

@@ -22,6 +22,8 @@ Can also be called in modale, triggering plugin button click for direct access t
 
 "use strict"
 
+
+
 if (!jeeFrontEnd.plugin) {
   jeeFrontEnd.plugin = {
     init: function() {
@@ -66,6 +68,7 @@ if (!jeeFrontEnd.plugin) {
       domUtils.showLoading()
       jeedom.plugin.get({
         id: _pluginId,
+        full: 1,
         error: function(error) {
           jeedomUtils.showAlert({
             message: error.message,
@@ -104,13 +107,19 @@ if (!jeeFrontEnd.plugin) {
             self.dom_container.querySelector('#span_plugin_author').innerHTML = ''
           }
 
+          if (isset(data.usedSpace)) {
+            self.dom_container.querySelector('#span_plugin_usedSpace').innerHTML = jeedomUtils.readableFileSize(data.usedSpace)
+          } else {
+            self.dom_container.querySelector('#span_plugin_usedSpace').innerHTML = ''
+          }
+          
           if (isset(data.category) && isset(jeephp2js.pluginCategories[data.category])) {
             self.dom_container.querySelector('#span_plugin_category').innerHTML = jeephp2js.pluginCategories[data.category].name
           } else {
             self.dom_container.querySelector('#span_plugin_category').innerHTML = ''
           }
           if (isset(data.source)) {
-            if (isset(data.update.configuration.user)){
+            if (isset(data.update) && isset(data.update.configuration) && isset(data.update.configuration.user)){
                 self.dom_container.querySelector('#span_plugin_source').innerHTML = data.source +' - '+data.update.configuration.user
             } else {
                 self.dom_container.querySelector('#span_plugin_source').innerHTML = data.source
@@ -793,7 +802,7 @@ document.getElementById('div_confPlugin')?.addEventListener('mouseup', function(
 
 document.getElementById('div_confPlugin')?.addEventListener('change', function(event) {
   var _target = null
-  if (_target = event.target.closest('#div_resumePluginList .configKey')) {
+  if (_target = event.target.closest('.configKey')) {
     if (_target.isVisible()) jeeFrontEnd.modifyWithoutSave = true
     return
   }

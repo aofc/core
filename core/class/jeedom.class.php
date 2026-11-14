@@ -24,6 +24,7 @@ class jeedom {
 
 	private static $jeedomConfiguration;
 	private static $jeedom_encryption = null;
+	private static $cache = array();
 
 	/*     * ***********************Methode static*************************** */
 
@@ -221,6 +222,9 @@ class jeedom {
 		$state = self::isDateOk();
 		$cache = cache::byKey('hour');
 		$lastKnowDate = $cache->getValue();
+		if($lastKnowDate === ""){
+			$lastKnowDate = 0;
+		}
 		$return[] = array(
 			'name' => __('Date système (dernière heure enregistrée)', __FILE__),
 			'state' => $state,
@@ -259,7 +263,7 @@ class jeedom {
 
 		$return[] = array(
 			'name' => __('Version OS', __FILE__),
-			'state' => (system::getDistrib() != 'debian' || version_compare(system::getOsVersion(), '10', '>=')),
+			'state' => (system::getDistrib() == 'debian' && version_compare(system::getOsVersion(), config::byKey('os::min'), '>=')),
 			'result' => system::getDistrib() . ' ' . system::getOsVersion(),
 			'comment' => '',
 			'key' => 'os::version'
@@ -276,7 +280,7 @@ class jeedom {
 
 		$apaches = count(system::ps('apache2'));
 		$return[] = array(
-			'name' => __('Apache', __FILE__),
+			'name' => __('Nombre de processus Apache', __FILE__),
 			'state' => ($apaches > 0),
 			'result' => $apaches,
 			'comment' => '',
@@ -332,6 +336,15 @@ class jeedom {
 			'key' => 'database::connexion'
 		);
 
+		$size = DB::Prepare('SELECT SUM(data_length + index_length) as size FROM information_schema.tables WHERE table_schema = \'jeedom\' GROUP BY table_schema;', array(), DB::FETCH_TYPE_ROW);
+		$return[] = array(
+			'name' => __('Taille base de données', __FILE__),
+			'state' => true,
+			'result' => sizeFormat($size['size']),
+			'comment' => '',
+			'key' => 'database::size'
+		);
+
 		$value = self::checkSpaceLeft(self::getTmpFolder());
 		$return[] = array(
 			'name' => __('Espace disque libre tmp', __FILE__),
@@ -350,7 +363,7 @@ class jeedom {
 			'comment' => '',
 		);
 
-		$value = shell_exec('sudo dmesg | grep oom | grep -v deprecated | wc -l');
+		$value = shell_exec('sudo dmesg | grep oom-killer | grep -v deprecated | wc -l');
 		$return[] = array(
 			'name' => __('Mémoire suffisante', __FILE__),
 			'state' => ($value == 0),
@@ -403,7 +416,7 @@ class jeedom {
 			$ok = true;
 		}
 		$return[] = array(
-			'name' => __('Swapiness', __FILE__),
+			'name' => __('Swappiness', __FILE__),
 			'state' => $ok,
 			'result' => $value . '%',
 			'comment' => ($ok) ? '' : __('Pour des performances optimales le swapiness ne doit pas dépasser 20% si vous avez 1Go ou moins de mémoire', __FILE__),
@@ -414,7 +427,7 @@ class jeedom {
 		$return[] = array(
 			'name' => __('Charge', __FILE__),
 			'state' => ($values[2] < 20),
-			'result' => $values[0] . ' - ' . $values[1] . ' - ' . $values[2],
+			'result' => round($values[0],2) . ' - ' . round($values[1],2) . ' - ' . round($values[2],2),
 			'comment' => '',
 			'key' => 'load'
 		);
@@ -447,7 +460,7 @@ class jeedom {
 		);
 
 		if (shell_exec('which python') != '') {
-			$value = shell_exec('python --version');
+			$value = shell_exec('python --version 2>&1'); // prior python 3.4, 'python --version' output was on stderr
 			$return[] = array(
 				'name' => __('Python', __FILE__),
 				'state' => true,
@@ -991,13 +1004,13 @@ class jeedom {
 			if (!isset($_GET['mode']) || $_GET['mode'] != 'force') {
 				throw $e;
 			} else {
-				echo '***ERROR*** ' . $e->getMessage();
+				echo '***ERROR*** ' . log::exception($e);
 			}
 		} catch (Error $e) {
 			if (!isset($_GET['mode']) || $_GET['mode'] != 'force') {
 				throw $e;
 			} else {
-				echo '***ERROR*** ' . $e->getMessage();
+				echo '***ERROR*** ' . log::exception($e);
 			}
 		}
 	}
@@ -1053,9 +1066,9 @@ class jeedom {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		}
 		try {
 			eqLogic::checkAlive();
@@ -1066,13 +1079,6 @@ class jeedom {
 
 	public static function cron10() {
 		try {
-			network::cron10();
-		} catch (Exception $e) {
-			log::add('network', 'error', 'network::cron : ' . $e->getMessage());
-		} catch (Error $e) {
-			log::add('network', 'error', 'network::cron : ' . $e->getMessage());
-		}
-		try {
 			foreach ((update::listRepo()) as $name => $repo) {
 				$class = 'repo_' . $name;
 				if (class_exists($class) && method_exists($class, 'cron10') && config::byKey($name . '::enable') == 1) {
@@ -1080,9 +1086,9 @@ class jeedom {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		}
 	}
 
@@ -1224,15 +1230,14 @@ class jeedom {
 			cron::clean();
 			report::clean();
 			DB::optimize();
-			cache::clean();
 			listener::clean();
 			user::regenerateHash();
 			jeeObject::cronDaily();
 			timeline::clean(false);
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		}
 		try {
 			foreach ((update::listRepo()) as $name => $repo) {
@@ -1242,9 +1247,13 @@ class jeedom {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
+		}
+		$disk_space = self::checkSpaceLeft();
+		if($disk_space < 10){
+			log::add('jeedom', 'error',__('Espace disque disponible faible : ',__FILE__).$disk_space.'%.'.__('Veuillez faire de la place (suppression de backup, de video/capture du plugin camera, d\'historique...)',__FILE__));
 		}
 	}
 
@@ -1252,9 +1261,16 @@ class jeedom {
 		try {
 			cache::set('hour', strtotime('UTC'));
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
+		}
+		try {
+			cache::clean();
+		} catch (Exception $e) {
+			log::add('jeedom', 'error', log::exception($e));
+		} catch (Error $e) {
+			log::add('jeedom', 'error', log::exception($e));
 		}
 		try {
 			//Check for updates every 24h according to config
@@ -1277,9 +1293,9 @@ class jeedom {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		}
 		try {
 			foreach ((update::listRepo()) as $name => $repo) {
@@ -1289,9 +1305,9 @@ class jeedom {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		} catch (Error $e) {
-			log::add('jeedom', 'error', $e->getMessage());
+			log::add('jeedom', 'error', log::exception($e));
 		}
 	}
 
@@ -1533,7 +1549,7 @@ class jeedom {
 		if (count($_eqlogics) == 0 && count($_cmds) == 0) {
 			throw new Exception('{{Aucun équipement ou commande à remplacer ou copier}}');
 		}
-		foreach (['copyEqProperties', 'hideEqs', 'copyCmdProperties', 'removeCmdHistory', 'copyCmdHistory'] as $key) {
+		foreach (['copyEqProperties', 'hideEqs', 'copyCmdProperties', 'removeCmdHistory', 'copyCmdHistory','disableEqs'] as $key) {
 			if (!isset($_options[$key])) {
 				$_options[$key] = false;
 			}
@@ -1620,11 +1636,20 @@ class jeedom {
 				$targetEq->save();
 				$return['eqlogics'] += 1;
 			}
-		} elseif ($_options['hideEqs'] == "true") {
+		} 
+		if ($_options['hideEqs'] == "true") {
 			foreach ($_eqlogics as $_sourceId => $_targetId) {
 				$sourceEq = eqLogic::byId($_sourceId);
 				if (!is_object($sourceEq)) continue;
 				$sourceEq->setIsVisible(0);
+				$sourceEq->save();
+			}
+		}
+		if ($_options['disableEqs'] == "true") {
+			foreach ($_eqlogics as $_sourceId => $_targetId) {
+				$sourceEq = eqLogic::byId($_sourceId);
+				if (!is_object($sourceEq)) continue;
+				$sourceEq->setIsEnable(0);
 				$sourceEq->save();
 			}
 		}
@@ -1721,9 +1746,12 @@ class jeedom {
 		return round(disk_free_space($path) / disk_total_space($path) * 100);
 	}
 
-	public static function getTmpFolder($_plugin = null) {
+	public static function getTmpFolder($_plugin = '') {
+		if(isset(self::$cache['getTmpFolder::' . $_plugin])){
+			return self::$cache['getTmpFolder::' . $_plugin];
+		}
 		$return = '/' . trim(config::byKey('folder::tmp'), '/');
-		if ($_plugin !== null) {
+		if ($_plugin !== '') {
 			$return .= '/' . $_plugin;
 		}
 		if (!file_exists($return)) {
@@ -1731,6 +1759,7 @@ class jeedom {
 			$cmd = system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . $return . ';';
 			com_shell::execute($cmd);
 		}
+		self::$cache['getTmpFolder::' . $_plugin] = $return;
 		return $return;
 	}
 
@@ -1775,6 +1804,8 @@ class jeedom {
 			$result = 'Atlas';
 		} else if (strpos($hostname, 'Luna') !== false) {
 			$result = 'Luna';
+		} else if (file_exists('/proc/1/sched') && strpos(shell_exec('cat /proc/1/sched | head -n 1'),'systemd') === false){
+			$result = 'docker';
 		}
 		config::save('hardware_name', $result);
 		return config::byKey('hardware_name');

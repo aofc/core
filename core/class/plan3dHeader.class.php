@@ -89,6 +89,9 @@ class plan3dHeader {
 		if (file_exists($cibDir) && $this->getConfiguration('path', '') != '') {
 			rrmdir($cibDir);
 		}
+		foreach (($this->getPlan3d()) as $plan3d) {
+			$plan3d->remove();
+		}
 		jeedom::addRemoveHistory(array('id' => $this->getId(), 'name' => $this->getName(), 'date' => date('Y-m-d H:i:s'), 'type' => 'plan3d'));
 		DB::remove($this);
 	}
@@ -167,6 +170,7 @@ class plan3dHeader {
 	}
 
 	public function setName($_name) {
+		$_name = trim($_name);
 		$this->_changed = utils::attrChanged($this->_changed, $this->name, $_name);
 		$this->name = $_name;
 		return $this;

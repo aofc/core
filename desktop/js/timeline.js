@@ -204,11 +204,11 @@ document.getElementById('in_searchTimeline')?.addEventListener('keyup', function
   var match, text
   document.querySelectorAll('#events > li.event').forEach(_li => {
     match = false
-    text = jeedomUtils.normTextLower(_li.querySelector('.tml-cmd').textContent)
+    text = jeedomUtils.normTextLower(_li.querySelector('.tml-cmd')?.textContent)
     if (text.includes(search)) {
       match = true
     }
-    text = jeedomUtils.normTextLower(_li.querySelector('.type').textContent)
+    text = jeedomUtils.normTextLower(_li.querySelector('.type')?.textContent)
     if (text.includes(search)) {
       match = true
     }
@@ -231,7 +231,7 @@ document.getElementById('bt_refreshTimeline').addEventListener('click', function
   jeeP.displayTimeline()
 })
 
-document.getElementById('bt_removeTimelineEvent').addEventListener('click', function(event) {
+document.getElementById('bt_removeTimelineEvent')?.addEventListener('click', function(event) {
   jeedom.timeline.deleteAll({
     error: function(error) {
       jeedomUtils.showAlert({
@@ -249,7 +249,7 @@ document.getElementById('bt_removeTimelineEvent').addEventListener('click', func
   })
 })
 
-document.getElementById('bt_openCmdHistoryConfigure').addEventListener('click', function(event) {
+document.getElementById('bt_openCmdHistoryConfigure')?.addEventListener('click', function(event) {
   jeeDialog.dialog({
     id: 'jee_modal',
     title: "{{Configuration de l'historique des commandes}}",

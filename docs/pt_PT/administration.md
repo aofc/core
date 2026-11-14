@@ -23,7 +23,7 @@ Abaixo, vários parâmetros que centralizam as informações que podem ser usada
 
 - Informações para contato : Latitude, longitude e altitude da sua casa / site.
 - Endereço : Endereço para correspondência da sua casa / site.
-- Vários : Superfície e número de ocupantes da sua casa / local.
+- Variado : Superfície e número de ocupantes da sua casa / local.
 
 ## Guia Interface
 
@@ -34,7 +34,7 @@ Nesta guia, você encontrará os parâmetros de personalização de exibição.
 - **Área de trabalho clara e escura** : Permite escolher um tema claro e escuro para a área de trabalho.
 - **Celular claro e escuro** : mesmo que acima para a versão Mobile.
 - **Limpar tema de / para** : Permite-lhe definir um intervalo de tempo durante o qual o tema claro escolhido anteriormente será usado. No entanto, marque a opção **Alternar tema com base no tempo**.
-- **Sensor de brilho**   : Somente interface móvel, requer ativação *sensor extra genérico* no cromo, página do cromo://flags.
+- **Sensor de brilho** : Somente interface móvel, requer ativação *sensor extra genérico* no cromo, página do cromo://flags.
 
 ### Tuiles
 
@@ -42,7 +42,7 @@ Nesta guia, você encontrará os parâmetros de personalização de exibição.
 - **Não vertical** : Restringe a altura dos blocos a cada x pixels.
 - **Margem** : Espaço vertical e horizontal entre blocos, em pixels.
 - **Centralização vertical de ladrilhos** : Centraliza verticalmente o conteúdo dos blocos.
-- **Ícones coloridos de widget** : Ícones de widget para colorir com base em seu estado. Modificável por cenário, *setColoredIcon* ('Coloração de ícone').
+- **Ícones coloridos de widget** : Ícones de widget para colorir com base em seu estado. Modificável por cenário, *definirColoredIcon* ('Coloração de ícone').
 - **Categorias coloridas** : Colorização do título dos tiles de acordo com a categoria.
 - **Móvel : uma coluna padrão** : Exibição de largura total de blocos em dispositivos móveis
 
@@ -65,9 +65,9 @@ Nesta guia, você encontrará os parâmetros de personalização de exibição.
 
 ### Personnalisation
 
-- **Permitir** : Ative o uso das opções abaixo.
+- **Habilitar** : Ative o uso das opções abaixo.
 - **Transparência** : Exibe blocos do painel e algum conteúdo com transparência. 1 : totalmente opaco, 0 : totalmente transparente.
-- **Redondo** : Exibe elementos da interface com ângulos arredondados. 0 : sem arredondamento, 1 : arredondamento máximo.
+- **Arredondado** : Exibe elementos da interface com ângulos arredondados. 0 : sem arredondamento, 1 : arredondamento máximo.
 - **Desativar sombras** : Desativa sombras de blocos no painel, menus e certos elementos da interface.
 
 
@@ -103,11 +103,11 @@ Nesta guia, você encontrará os parâmetros de personalização de exibição.
     - **Conecte-se** : Digite o login do proxy,
     - **Senha** : Digite a senha.
 
-> **Dica**
+> **Conselho**
 >
 > Se você estiver em HTTPS, a porta é 443 (padrão) e em HTTP, a porta é 80 (padrão)). Para usar HTTPS de fora, um plug-in letsencrypt agora está disponível no mercado.
 
-> **Dica**
+> **Conselho**
 >
 > Para descobrir se você precisa definir um valor no campo **Complemento**, veja, quando você faz login no Jeedom no seu navegador da Internet, se precisar adicionar / Jeedom (ou qualquer outra coisa) após o IP.
 
@@ -116,7 +116,7 @@ Nesta guia, você encontrará os parâmetros de personalização de exibição.
 - **Mercado de proxy** : permite acesso remoto ao seu Jeedom sem a necessidade de um DNS, um IP fixo ou abrir as portas da sua caixa da Internet.
     - **Usando o DNS Jeedom** : ativa o DNS Jeedom (observe que isso requer pelo menos um service pack).
     - **Status de DNS** : Status HTTP DNS.
-    - **Gestão** : permite parar e reiniciar o serviço DNS Jeedom.
+    - **Gerenciamento** : permite parar e reiniciar o serviço DNS Jeedom.
 
 > **Importante**
 >
@@ -172,6 +172,10 @@ Abaixo, você encontrará uma tabela para gerenciar com precisão o nível de lo
 
 Muitos pedidos podem ser registrados. Assim, em Análise → Histórico, você obtém gráficos representando seu uso. Essa guia permite definir parâmetros globais para o log de comandos.
 
+>**InfluxoDB**
+>
+>Se você quiser usar o InfluxDB no momento você mesmo terá que instalar a biblioteca InfluxDB, o Jeedom não faz mais isso porque ela não é mais mantida (planejamos migrar para a nova versão, mas isso não acontecerá imediatamente). Para fazer a instalação manual, veja como fazer : `cd /var/www/html;composer require influxdb/influxdb-php` da configuração, depois na guia OS/DB e depois no console de administração do sistema operacional
+
 ### Histórico de pedidos
 
 - **Mostrar estatísticas sobre os widgets** : Ver estatísticas sobre widgets. O widget deve ser compatível, como é o caso da maioria. O comando também deve ser do tipo numérico.
@@ -213,13 +217,13 @@ Configurar gráficos de link. Esses links permitem ver, na forma de gráfico, as
 - **Profundidade para encomendas** : Mesmo para pedidos.
 - **Profundidade para variáveis** : O mesmo para variáveis.
 - **Prerender parâmetro** : Permite que você atue no layout do gráfico.
-- **Parâmetro renderizar** : Mesmo.
+- **Parâmetro renderizar** : Idem.
 
 ## Guia Interações
 
 Essa guia permite definir parâmetros globais relativos às interações que você encontrará em Ferramentas → Interações.
 
-> **Dica**
+> **Conselho**
 >
 > Para ativar o log de interação, vá para a guia Configurações → Sistema → Configuração : Logs e verifique **Depurar** na lista inferior. Atenção : os logs serão muito detalhados !
 
@@ -241,15 +245,15 @@ Aqui você tem três parâmetros :
 
 -   O **interações contextuais** permitem encadear várias solicitações sem repetir tudo, por exemplo :
     - *Jeedom mantendo o contexto :*
-        - *Você* : Quanto ele está na sala ?
+        - *VOCÊ* : Quanto ele está na sala ?
         - *Jeedom* : Temperatura 25.2 ° C
-        - *Você* : e na sala de estar ?
+        - *VOCÊ* : e na sala de estar ?
         - *Jeedom* : Temperatura 27.2 ° C
     - *Faça duas perguntas em uma :*
-        - *Você* : Como é no quarto e na sala de estar ?
+        - *VOCÊ* : Como é no quarto e na sala de estar ?
         - *Jeedom* : Temperatura 23.6 ° C, Temperatura 27.2 ° C
 -   Interações de tipo **Avise-me** permita que a Jeedom avise se um pedido excede / cai ou vale algum valor.
-    - *Você* : Notifique-me se a temperatura da sala exceder 25 ° C ?
+    - *VOCÊ* : Notifique-me se a temperatura da sala exceder 25 ° C ?
     - *Jeedom* : OK (*Assim que a temperatura da sala exceder 25 ° C, Jeedom dirá, uma vez*)
 
 > **Observação**
@@ -304,7 +308,7 @@ A lista de IPs banidos está na parte inferior desta página. Você encontrará 
 
 - **Fonte atualização** : Escolha a fonte de atualização principal do Jeedom.
 - **Core Version** : Versão principal a recuperar.
-- **Verificar atualizações automaticamente** : Indique se deve verificar automaticamente se há novas atualizações (tenha cuidado para evitar sobrecarregar o mercado, o tempo de verificação pode mudar).
+- **Verificar atualizações automaticamente** : Indica se deve verificar automaticamente se há novas atualizações (cuidado para não sobrecarregar o Market, o horário de verificação pode mudar).
 
 ### Depósitos
 
@@ -359,7 +363,7 @@ Depósito que permite enviar automaticamente um backup do Jeedom em um compartil
 
 > **Importante**
 >
-> O protocolo Samba possui várias versões, a v1 está comprometida em termos de segurança e, em alguns NAS, você pode forçar o cliente a usar a v2 ou v3 para conectar-se. Então, se você tiver um erro *falha na negociação do protocolo: NT_STATUS_INVAID_NETWORK_RESPONSE* existe uma boa chance de que, no lado do NAS, a restrição esteja em vigor. Você deve modificar o arquivo / etc / samba / smb no seu Jeedom OS.conf e adicione essas duas linhas a ele :
+> O protocolo Samba possui diversas versões, o nível de segurança da V1 fica comprometido e em determinados NAS você pode forçar o cliente a usar v2 ou v3 para se conectar. Então, se você tiver um erro *falha na negociação do protocolo: NT_STATUS_INVAID_NETWORK_RESPONSE* há uma boa chance de que a restrição esteja em vigor no lado do NAS. Você deve modificar o arquivo / etc / samba / smb no seu Jeedom OS.conf e adicione essas duas linhas a ele :
 > protocolo máximo do cliente = SMB3
 > protocolo min de cliente = SMB2
 > O smbclient do lado do Jeedom usará v2 em que v3 e colocando SMB3 em ambos apenas SMB3. Cabe a você adaptar de acordo com as restrições no servidor NAS ou outro servidor Samba
@@ -377,13 +381,19 @@ Depósito que permite enviar automaticamente um backup do Jeedom em um compartil
 
 Permite monitorar e agir no cache Jeedom :
 
-- **Estatisticas** : Número de objetos atualmente armazenados em cache.
+- **Mecanismo de cache** : escolha do mecanismo de cache para jeedom : 
+  - Sistema de arquivo : Armazenamento de informações de cache /tmp/jeedom/cache (em RAM) no modo de arquivo, usa uma biblioteca de terceiros. Em breve será substituído por Arquivo (beta)
+  - Arquivo (beta) : Armazenamento de informações de cache /tmp/jeedom/cache (em RAM) no modo de arquivo. O mais eficiente, mas economizado a cada 30 minutos
+  - MySQL (beta)) : Usando uma tabela de cache básica. O menos eficiente, mas salvo em tempo real (sem possibilidade de perda de dados)
+  - Redis (beta) : Reservado para especialistas, depende do redis para gerenciar o cache (portanto, requer que você mesmo instale o redis e as dependências do php-redis)
 - **Cache de limpo** : Forçar a exclusão de objetos que não são mais úteis. Jeedom faz isso automaticamente todas as noites.
 - **Vazio todos os dados de cache** : Esvazie a tampa completamente.
     Observe que isso pode causar perda de dados !
-- **Limpe o cache do widget** : Limpe o cache dedicado aos widgets.
-- **Desativar cache do widget** : Marque a caixa para desativar o cache do widget.
-- **Tempo de pausa para o longo polling** : Frequência com que o Jeedom verifica se há eventos pendentes para os clientes (interface da web, aplicativo móvel etc.)). Quanto menor o tempo, mais rápida será a atualização da interface. Em troca, ela usa mais recursos e, portanto, pode retardar o Jeedom.
+- **Tempo de pausa para o longo polling** : Frequência com que o Jeedom verifica se há eventos pendentes para os clientes (interface web, aplicativo móvel, etc.)). Quanto menor for esse tempo, mais rápido a interface será atualizada, em troca, isso consome mais recursos e pode, portanto, desacelerar o Jeedom.
+
+>**Importante**
+>
+> Qualquer alteração no mecanismo de cache resulta em uma redefinição dele, então você terá que esperar que os módulos enviem de volta as informações para encontrar tudo
 
 ## Guia API
 
@@ -397,7 +407,7 @@ Para cada chave de plug-in de API, bem como para APIs HTTP, JsonRPC e TTS, é po
 
 - **Desativado** : A chave da API não pode ser usada,
 - **Branco IP** : apenas uma lista de IPs é autorizada (consulte Configurações → Sistema → Configuração : Segurança),
-- **Localhost** : somente solicitações do sistema no qual o Jeedom está instalado são permitidas,
+- **Host local** : somente solicitações do sistema no qual o Jeedom está instalado são permitidas,
 - **Habilitado** : sem restrições, qualquer sistema com acesso ao seu Jeedom poderá acessar esta API.
 
 Para cada chave de API de plugin você pode proibi-los de métodos centrais (geral) para limitá-los ao seu único método embutido (tenha cuidado com alguns plugins como mobile ou jeelink absolutamente precisam de métodos centrais)

@@ -98,6 +98,9 @@ if (!jeeFrontEnd.pluginTemplate) {
           if (isset(data) && isset(data.timeout) && data.timeout == 0) {
             data.timeout = ''
           }
+          if(document.getElementById('img_device') != null && document.querySelector('.eqLogicDisplayCard.active img').getAttribute('src') != ''){
+            document.getElementById('img_device').setAttribute("src",document.querySelector('.eqLogicDisplayCard.active img').getAttribute('src'));
+          }
           document.getElementById('div_mainContainer').setJeeValues(data, '.eqLogicAttr')
           if (!isset(data.category.opening)) try { document.querySelector('input[data-l2key="opening"]').checked = false } catch (e) { }
 
@@ -129,17 +132,17 @@ if (!jeeFrontEnd.pluginTemplate) {
           }
           document.querySelectorAll('.cmdTableState').forEach(_cmdState => {
             jeedom.cmd.addUpdateFunction(_cmdState.getAttribute('data-cmd_id'), function(_options) {
-              _options.display_value = String(_options.display_value).replace(/<[^>]*>?/gm, '')
+              _options.value = String(_options.value).replace(/<[^>]*>?/gm, '')
               let cmd = document.querySelector('.cmdTableState[data-cmd_id="' + _options.cmd_id + '"]')
               if (cmd === null) {
                 return
               }
               let title = '{{Date de collecte}} : ' + _options.collectDate + '<br/>{{Date de valeur}} ' + _options.valueDate
-              if (_options.display_value.length > 50) {
-                title += ' - ' + _options.display_value
+              if (_options.value.length > 50) {
+                title += ' - ' + _options.value
               }
               cmd.setAttribute('title', title)
-              cmd.empty().innerHTML = _options.display_value.substring(0, 50) + ' ' + _options.unit
+              cmd.empty().innerHTML = _options.value.substring(0, 50) + ' ' + _options.unit
               cmd.style.color = 'var(--logo-primary-color)'
               setTimeout(function() {
                 cmd.style.color = null
@@ -151,8 +154,10 @@ if (!jeeFrontEnd.pluginTemplate) {
           jeedomUtils.addOrUpdateUrl('id', data.id)
           domUtils.hideLoading()
           jeeFrontEnd.modifyWithoutSave = false
+          modifyWithoutSave = false
           setTimeout(function() {
             jeeFrontEnd.modifyWithoutSave = false
+            modifyWithoutSave = false
           }, 1000)
 
           if (window.location.hash == '') document.querySelector('.nav-tabs a:not(.eqLogicAction)')?.click()
@@ -278,6 +283,7 @@ if (!jeeFrontEnd.pluginTemplate) {
                 }
               }
               jeeFrontEnd.modifyWithoutSave = false
+              modifyWithoutSave = false
               url += 'id=' + _data.id + '&saveSuccessFull=1'
               jeedomUtils.loadPage(url)
             }
@@ -323,6 +329,7 @@ if (!jeeFrontEnd.pluginTemplate) {
         },
         success: function(data) {
           jeeFrontEnd.modifyWithoutSave = false
+          modifyWithoutSave = false
           var vars = getUrlVars()
           var url = 'index.php?'
           for (var i in vars) {
@@ -345,6 +352,7 @@ if (!jeeFrontEnd.pluginTemplate) {
 
           jeedomUtils.loadPage(url)
           jeeFrontEnd.modifyWithoutSave = false
+          modifyWithoutSave = false
         }
       })
       return false
@@ -369,6 +377,7 @@ if (!jeeFrontEnd.pluginTemplate) {
                 },
                 success: function(data) {
                   jeeFrontEnd.modifyWithoutSave = false
+                  modifyWithoutSave = false
                   var vars = getUrlVars()
                   var url = 'index.php?'
                   for (var i in vars) {
@@ -402,7 +411,7 @@ if (!jeeFrontEnd.pluginTemplate) {
           success: function(data) {
             var text = '{{Êtes-vous sûr de vouloir supprimer l\'équipement}} ' + textEqtype + ' <b>' + document.querySelector('.eqLogicAttr[data-l1key="name"]').jeeValue() + '</b> ?'
             if (Object.keys(data).length > 0) {
-              text += ' </br> {{Il est utilisé par ou utilise :}}</br>'
+              text += ' </br> {{Il est utilisé par:}}</br>'
               var complement = null
               for (var i in data) {
                 complement = ''
@@ -591,6 +600,7 @@ domUtils(function() {
     chosenClass: 'dragSelected',
     onEnd: function(event) {
       jeeFrontEnd.modifyWithoutSave = true
+      modifyWithoutSave = true
     },
   })
   tableCmd._sortable = jeeFrontEnd.pluginTemplate.cmdSortable
@@ -703,6 +713,7 @@ document.getElementById('div_pageContainer').addEventListener('click', function(
     }
     document.querySelectorAll('.cmdAttr[data-l1key="type"]').last().triggerEvent('change')
     jeeFrontEnd.modifyWithoutSave = true
+    modifyWithoutSave = true
     return
   }
 
@@ -714,6 +725,7 @@ document.getElementById('div_pageContainer').addEventListener('click', function(
     jeedomUtils.chooseIcon(function(_icon) {
       cmd.querySelector('.cmdAttr[data-l1key="display"][data-l2key="icon"]').empty().innerHTML = _icon
       jeeFrontEnd.modifyWithoutSave = true
+      modifyWithoutSave = true
     }, params)
     return
   }
@@ -721,6 +733,7 @@ document.getElementById('div_pageContainer').addEventListener('click', function(
   if (_target = event.target.closest('.cmd .cmdAction[data-action="remove"]')) {
     _target.closest('tr').remove()
     jeeFrontEnd.modifyWithoutSave = true
+    modifyWithoutSave = true
     return
   }
 
@@ -733,6 +746,7 @@ document.getElementById('div_pageContainer').addEventListener('click', function(
       jeeFrontEnd.pluginTemplate.addCmdToTableDefault(cmd)
     }
     jeeFrontEnd.modifyWithoutSave = true
+    modifyWithoutSave = true
     return
   }
 
@@ -785,6 +799,7 @@ document.getElementById('div_pageContainer').addEventListener('dblclick', functi
   if (_target = event.target.closest('.cmdAttr[data-l1key="display"][data-l2key="icon"]')) {
     _target.innerHTML = ''
     jeeFrontEnd.modifyWithoutSave = true
+    modifyWithoutSave = true
     return
   }
 
@@ -801,12 +816,18 @@ document.getElementById('div_pageContainer').addEventListener('dblclick', functi
 document.getElementById('div_pageContainer').addEventListener('change', function(event) {
   var _target = null
   if (_target = event.target.closest('.eqLogic .eqLogicAttr')) {
-    if (_target.isVisible()) jeeFrontEnd.modifyWithoutSave = true
+    if (_target.isVisible()) {
+      jeeFrontEnd.modifyWithoutSave = true
+      modifyWithoutSave = true
+    }
     return
   }
 
   if (_target = event.target.closest('.cmd .cmdAttr')) {
-    if (_target.isVisible()) jeeFrontEnd.modifyWithoutSave = true
+    if (_target.isVisible()) {
+      jeeFrontEnd.modifyWithoutSave = true
+      modifyWithoutSave = true
+    }
   }
 
   if (_target = event.target.closest('.cmd select.cmdAttr[data-l1key="type"]')) {

@@ -138,7 +138,8 @@ $cmd_widgetMobile = cmd::availableWidget('mobile');
                   foreach (($eqLogic->widgetPossibility('parameters')) as $pKey => $parameter) {
                     $echo .= '<tr>';
                     $echo .= '<td>';
-                    $echo .= $parameter['name'];
+                    if (is_array($parameter['name']) && isset($parameter['name'][translate::getLanguage()])) $echo .= $parameter['name'][translate::getLanguage()];
+                    else $echo .= $parameter['name'];
                     $echo .= '</td>';
                     foreach ((jeedom::getConfiguration('eqLogic:displayType')) as $key => $value) {
                       $echo .= '<td>';
@@ -213,7 +214,7 @@ $cmd_widgetMobile = cmd::availableWidget('mobile');
                     $echo .= '<input class="form-control input-sm key" value="' . $key . '">';
                     $echo .= '</td>';
                     $echo .= '<td>';
-                    $echo .= '<input class="form-control input-sm value" value="' . $value . '">';
+                    $echo .= '<input class="form-control input-sm value" value="' . htmlspecialchars($value, ENT_QUOTES) . '">';
                     $echo .= '</td>';
                     $echo .= '<td class="text-right">';
                     $echo .= '<a class="btn btn-danger btn-xs removeTileParameter"><i class="far fa-trash-alt"></i></a>';
@@ -264,11 +265,11 @@ $cmd_widgetMobile = cmd::availableWidget('mobile');
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{Lignes}}</label>
                   <div class="col-sm-4">
-                    <input type="number" min="1" max="20" step="1" class="eqLogicAttr form-control input-sm ispin" data-l1key="display" data-l2key="layout::dashboard::table::nbLine">
+                    <input type="number" min="1" step="1" class="eqLogicAttr form-control input-sm ispin" data-l1key="display" data-l2key="layout::dashboard::table::nbLine">
                   </div>
                   <label class="col-sm-2 control-label">{{Colonnes}}</label>
                   <div class="col-sm-4">
-                    <input type="number" min="1" max="20" step="1" class="eqLogicAttr form-control input-sm ispin" data-l1key="display" data-l2key="layout::dashboard::table::nbColumn">
+                    <input type="number" min="1" step="1" class="eqLogicAttr form-control input-sm ispin" data-l1key="display" data-l2key="layout::dashboard::table::nbColumn">
                     <a class="btn btn-success btn-xs" id="bt_eqLogicLayoutApply"><i class="fas fa-sync-alt"></i></i> {{Appliquer}}</a>
                   </div>
                 </div>
@@ -428,7 +429,7 @@ $cmd_widgetMobile = cmd::availableWidget('mobile');
                 $display .= '<tr class="cmdoptparam text-center">';
                 $display .= '<td colspan="3">';
                 $display .= '<input class="key" value="' . $key . '" style="width:45%;">';
-                $display .= ' <input class="value" value="' . $value . '" style="width:45%;">';
+                $display .= ' <input class="value" value="' . htmlspecialchars($value, ENT_QUOTES) . '" style="width:45%;">';
                 $display .= '<a class="btn btn-danger btn-xs pull-right removeWidgetParameter"><i class="fas fa-trash-alt"></i></a>';
                 $display .= '</td>';
                 $display .= '</tr>';

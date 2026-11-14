@@ -270,6 +270,18 @@ try {
 		$cron->setDeamon(0);
 		$cron->save();
 
+		$cron = cron::byClassAndFunction('queue', 'cron');
+		if (!is_object($cron)) {
+			echo "Create queue::cron\n";
+			$cron = new cron();
+		}
+		$cron->setClass('queue');
+		$cron->setFunction('cron');
+		$cron->setSchedule('* * * * *');
+		$cron->setTimeout(2);
+		$cron->setDeamon(0);
+		$cron->save();
+
 		$cron = cron::byClassAndFunction('plugin', 'cron5');
 		if (!is_object($cron)) {
 			echo "Create plugin::cron5\n";
@@ -367,6 +379,25 @@ try {
 		$cron->setTimeout(10);
 		$cron->save();
 
+		$cron = cron::byClassAndFunction('network', 'cron10');
+		if (!is_object($cron)) {
+			echo "Create network::cron10\n";
+			$cron = new cron();
+			$cron->setClass('network');
+			$cron->setFunction('cron10');
+			$rand_min = rand(0,9);
+			$cronString = '';
+			for($i=0;$i<6;$i++){
+				$cronString .= ($rand_min+($i*10)).',';
+			}
+			$cronString = trim($cronString,',').' * * * *';
+			$cron->setSchedule($cronString);
+			$cron->setEnable(1);
+			$cron->setDeamon(0);
+			$cron->setTimeout(60);
+			$cron->save();
+		}
+
 		if (!file_exists(__DIR__ . '/../plugins')) {
 			mkdir(__DIR__ . '/../plugins');
 		}
@@ -391,15 +422,7 @@ try {
 			echo "Remove unused ngrok folder...\n";
 			shell_exec(system::getCmdSudo() . 'rm -rf ' . __DIR__ . '/../script/ngrok');
 		}
-		try {
-			if (method_exists('cache', 'flushWidget')) {
-				echo "Flush cache widget...\n";
-				cache::flushWidget();
-			}
-		} catch (Exception $e) {
-		} catch (Error $e) {
-		}
-
+		
 		echo "Check jeedom object...";
 		foreach (jeeObject::all() as $object) {
 			try {
@@ -481,6 +504,14 @@ try {
 	echo "Check nodejs...";
     echo shell_exec('sudo ' . __DIR__ . '/../resources/install_nodejs.sh');
 	echo "OK\n";
+
+	echo "Check apache security file...";
+	$apache_security = file_get_contents('/etc/apache2/conf-available/security.conf');
+	if(strpos($apache_security,'jeedom.com') !== false && md5_file(__DIR__ . '/apache_security') != md5_file('/etc/apache2/conf-available/security.conf')){
+		echo "\nApache is configure in security mode and need update I will update file....";
+		echo shell_exec('sudo cp '.__DIR__ . '/apache_security /etc/apache2/conf-available/security.conf;sudo a2enmod headers;echo "systemctl reload apache2" | sudo at now');
+		echo "OK\n";
+	}
 } catch (Exception $e) {
 	echo "\nError : ";
 	echo $e->getMessage();

@@ -34,6 +34,11 @@ if (!isset(jeedom.eqLogic.cache.byId)) {
   jeedom.eqLogic.cache.byId = Array()
 }
 
+if(!isset(jeedom.eqLogic.cache.byLogical)){
+  jeedom.eqLogic.cache.byLogical = Array()
+
+}
+
 jeedom.eqLogic.save = function(_params) {
   var paramsRequired = ['type', 'eqLogics']
   var paramsSpecifics = {
@@ -264,7 +269,8 @@ jeedom.eqLogic.toHtml = function(_params) {
   paramsAJAX.data = {
     action: 'toHtml',
     id: _params.id,
-    version: _params.version
+    version: _params.version,
+    global : _params.global || false
   }
   domUtils.ajax(paramsAJAX)
 }
@@ -292,7 +298,8 @@ jeedom.eqLogic.getCmd = function(_params) {
   paramsAJAX.url = 'core/ajax/cmd.ajax.php'
   paramsAJAX.data = {
     action: 'byEqLogic',
-    eqLogic_id: _params.id
+    eqLogic_id: _params.id,
+    ...(_params.typeCmd ? { typeCmd: _params.typeCmd } : {}) 
   }
   domUtils.ajax(paramsAJAX)
 }
@@ -321,6 +328,54 @@ jeedom.eqLogic.byId = function(_params) {
   paramsAJAX.data = {
     action: 'byId',
     id: _params.id
+  }
+  domUtils.ajax(paramsAJAX)
+}
+
+jeedom.eqLogic.removeImage = function(_params) {
+  var paramsRequired = ['id'];
+  var paramsSpecifics = {};
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+    return;
+  }
+  var params = domUtils.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+  var paramsAJAX = jeedom.private.getParamsAJAX(params);
+  paramsAJAX.url = 'core/ajax/eqLogic.ajax.php';
+  paramsAJAX.data = {
+    action: 'removeImage',
+    id: _params.id
+  };
+  domUtils.ajax(paramsAJAX);
+}
+
+jeedom.eqLogic.byLogical = function(_params) {
+  var paramsRequired = ['logical', 'type']
+  var paramsSpecifics = {
+    pre_success: function(data) {
+      jeedom.eqLogic.cache.byLogical[data.result.logical, data.result.type] = data.result
+      return data
+    }
+  }
+  try {
+    jeedom.private.checkParamsRequired(_params || {}, paramsRequired)
+  } catch (e) {
+    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e)
+    return
+  }
+  if (init(_params.noCache, false) == false && isset(jeedom.eqLogic.cache.byLogical[_params.logical, _params.type]) && 'function' == typeof (_params.success)) {
+    _params.success(jeedom.eqLogic.cache.byLogical[_params.logical, _params.type])
+    return
+  }
+  var params = domUtils.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {})
+  var paramsAJAX = jeedom.private.getParamsAJAX(params)
+  paramsAJAX.url = 'core/ajax/eqLogic.ajax.php'
+  paramsAJAX.data = {
+    action: 'byLogical',
+    logical: _params.logical,
+    type: _params.type
   }
   domUtils.ajax(paramsAJAX)
 }
@@ -417,6 +472,7 @@ jeedom.eqLogic.refreshValue = function(_params) {
 
     eqLogics[_params[i].eqLogic_id] = {
       eqLogic: eqLogic,
+      type: eqLogic?.classList.contains('battery-widget') ? 'battery' : 'default'
     }
     sends[_params[i].eqLogic_id] = {
       version: ((version = eqLogic?.getAttribute('data-version')) != undefined) ? version : 'dashboard'
@@ -435,6 +491,9 @@ jeedom.eqLogic.refreshValue = function(_params) {
       for (var i in result) {
         tile = domUtils.parseHTML(result[i].html)
         if (tile.childNodes.length == 0) {
+          continue
+        }
+        if (eqLogics[i].type === 'battery') {
           continue
         }
         eqLogic = eqLogics[i].eqLogic
@@ -465,6 +524,35 @@ jeedom.eqLogic.refreshValue = function(_params) {
             let container = document.querySelector('.alertListContainer')
             Packery.data(container).destroy()
             new Packery(container, { itemSelector: "#alertEqlogic .eqLogic-widget", isLayoutInstant: true, transitionDuration: 0 })
+          } else if (page == 'plan' && !jeeFrontEnd.planEditOption.state) { //no create if plan is in edition
+            jeedom.plan.byPlanHeader({
+              id: jeephp2js.planHeader_id,
+              global: false,
+              error: function(error) {
+                jeedomUtils.showAlert({
+                  message: error.message,
+                  level: 'danger'
+                })
+              },
+              success: function(plans) {
+                try {
+                  var object
+                  for (var ii in plans) {
+                    if (plans[ii].plan.link_id == result[i].id) {
+                      object = jeeP.displayObject(plans[ii].plan, plans[ii].html, true)
+                      if (object != undefined) {
+                        jeeFrontEnd.plan.planContainer.appendChild(object)
+                        if (jeeFrontEnd.plan.cssStyleString != '') {
+                          jeeFrontEnd.plan.pageContainer.insertAdjacentHTML('beforeend', jeeFrontEnd.plan.cssStyleString)
+                          jeeFrontEnd.plan.cssStyleString = ''
+                        }
+                      }
+                      break;
+                    }
+                  }
+                } catch (e) { console.error(e) }
+              }
+            })
           }
         } else {
           if (page == 'eqAnalyse' && result[i].alert == '') {
@@ -502,8 +590,8 @@ jeedom.eqLogic.refreshValue = function(_params) {
         if (jeedomUtils.userDevice.type == undefined) {
           eqLogic.triggerEvent('create')
           jeedomUtils.setTileSize('.eqLogic')
-        } else if (typeof jeeFrontEnd?.dashboard?.editWidgetMode == 'function' && document.getElementById('bt_editDashboardWidgetOrder') != null) {
-          jeeFrontEnd.dashboard.editWidgetMode(jeedomUI?.isEditing)
+        } else if (typeof jeedomUI !== 'undefined' && typeof jeeFrontEnd?.dashboard?.editWidgetMode == 'function' && document.getElementById('bt_editDashboardWidgetOrder') != null) {
+          jeeFrontEnd.dashboard.editWidgetMode(jeedomUI?.isEditing,false)
         }
       }
     }

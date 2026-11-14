@@ -83,7 +83,7 @@ try {
 
 	if (init('action') == 'getApikey') {
 		if (!login(init('username'), init('password'), init('twoFactorCode'))) {
-			throw new Exception(__('Mot de passe ou nom d\'utilisateur incorrect'), __FILE__);
+			throw new Exception(__('Mot de passe ou nom d\'utilisateur incorrect', __FILE__));
 		}
 		ajax::success($_SESSION['user']->getHash());
 	}
@@ -169,6 +169,14 @@ try {
 			}
 			utils::a2o($user, $user_json);
 			$user->save();
+			if (isset($user_json['enable']) && $user_json['enable'] == 0) {
+        			$sessions = listSession();
+                		foreach ($sessions as $sessionId => $sessionData) {
+					if (isset($sessionData['user_id']) && $sessionData['user_id'] == $user->getId()) {
+                        			deleteSession($sessionId);
+                    			}
+                		}
+    			}
 		}
 		@session_start();
 		$_SESSION['user']->refresh();
@@ -229,7 +237,6 @@ try {
 		$_SESSION['user']->setLogin($login);
 		$_SESSION['user']->save();
 		@session_write_close();
-		eqLogic::clearCacheWidget();
 		ajax::success();
 	}
 

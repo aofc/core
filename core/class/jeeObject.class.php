@@ -147,6 +147,9 @@ class jeeObject {
 	}
 
 	public static function fromHumanReadable($_input) {
+		if(empty($_input)){
+			return $_input;
+		}
 		$isJson = false;
 		if (is_json($_input)) {
 			$isJson = true;
@@ -766,7 +769,7 @@ class jeeObject {
 				try {
 					$cmd->execCmd($_options);
 				} catch (\Exception $e) {
-					log::add('cmd', 'error', $cmd->getHumanName() . ' ' . $e->getMessage());
+					log::add('cmd', 'error', $cmd->getHumanName() . ' ' . log::exception($e));
 				}
 			}
 		}
@@ -1095,7 +1098,7 @@ class jeeObject {
 				}
 				$value = $cmd->execCmd();
 				if (isset($def[$_key]['ignoreIfCmdOlderThan']) && $def[$_key]['ignoreIfCmdOlderThan'] != '' && $def[$_key]['ignoreIfCmdOlderThan'] > 0) {
-					if ((strtotime('now') - strtotime($cmd->getCollectDate())) > ($def[$_key]['ignoreIfCmdOlderThan'] * 60)) {
+					if ((strtotime('now') - strtotime($cmd->getCollectDate())) > (intval($def[$_key]['ignoreIfCmdOlderThan']) * 60)) {
 						continue (2);
 					}
 				}
@@ -1267,14 +1270,14 @@ class jeeObject {
 	}
 
 	public function getFather_id($_default = null) {
-		if ($this->father_id == '' || !is_numeric($this->father_id)) {
+		if (!is_numeric($this->father_id)) {
 			return $_default;
 		}
 		return $this->father_id;
 	}
 
 	public function getIsVisible($_default = null) {
-		if ($this->isVisible == '' || !is_numeric($this->isVisible)) {
+		if (!is_numeric($this->isVisible)) {
 			return $_default;
 		}
 		return $this->isVisible;
@@ -1288,6 +1291,7 @@ class jeeObject {
 
 	public function setName($_name) {
 		$_name = substr(cleanComponanteName($_name), 0, 127);
+		$_name = trim($_name);
 		$this->_changed = utils::attrChanged($this->_changed, $this->name, $_name);
 		$this->name = $_name;
 		return $this;

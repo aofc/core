@@ -12,7 +12,7 @@ Esses pedidos podem ser obtidos por :
 
 O valor das interações reside na integração simplificada em outros sistemas, como smartphones, tablets, outras caixas de automação residencial, etc.
 
-> **Dica**
+> **Conselho**
 >
 > Você pode abrir uma interação fazendo :
 > - Clique em um deles.
@@ -34,7 +34,7 @@ No topo da página, existem 3 botões :
 - **Regenerar** : Recréer toutes les interactions (peut être très long &gt; 5mn).
 - **Teste** : Abra uma caixa de diálogo para escrever e testar uma frase.
 
-> **Dica**
+> **Conselho**
 >
 > Se você possui uma interação que gera sentenças para luzes, por exemplo, e adiciona um novo módulo de controle de luz, precisará regenerar todas as interações ou ir para a interação em questão e salvá-la novamente para criar as frases deste novo módulo.
 
@@ -51,15 +51,15 @@ Também podemos definir um comando a ser executado se, por exemplo, a interaçã
 A página de configuração consiste em várias guias e botões :
 
 - **Frases** : Exibe o número de frases da interação (um clique nelas mostra a você).
-- **Registrar** : Registra a interação atual.
-- **Deletar** : Excluir interação atual.
+- **Salvar** : Registra a interação atual.
+- **EXCLUIR** : Excluir interação atual.
 - **Duplicado** : Duplicar a interação atual.
 
 ### Guia Geral
 
-- **Sobrenome** : Nome da interação (pode estar vazio, o nome substitui o texto da solicitação na lista de interação).
+- **Nome** : Nome da interação (pode estar vazio, o nome substitui o texto da solicitação na lista de interação).
 - **Banda** : Grupo de interação, isso permite organizá-los (pode estar vazio, portanto estará no grupo "none").
-- **De ativos** : Permite ativar ou desativar a interação.
+- **Ativo** : Permite ativar ou desativar a interação.
 - **Solicitar** : A sentença do modelo de geração (obrigatório).
 - **Sinônimo** : Permite definir sinônimos nos nomes dos comandos.
 - **Resposta** : A resposta para fornecer.
@@ -103,7 +103,7 @@ Podemos muito bem imaginar fazendo o mesmo com várias ações para acender vár
 
 Nos 2 exemplos acima, a sentença modelo é idêntica, mas as ações resultantes dela mudam de acordo com o que está configurado na parte "Ação", portanto, já podemos, com uma interação simples com uma única frase, imaginar ações combinadas entre vários comandos e vários cenários (também podemos acionar cenários na parte de ação das interações).
 
-> **Dica**
+> **Conselho**
 >
 > Para adicionar um cenário, crie uma nova ação, escreva "cenário" sem acento, pressione a tecla Tab no teclado para abrir o seletor de cenário.
 
@@ -111,7 +111,7 @@ Nos 2 exemplos acima, a sentença modelo é idêntica, mas as ações resultante
 
 Aqui veremos todo o interesse e todo o poder das interações. Com uma sentença modelo, poderemos gerar sentenças para todo um grupo de comandos.
 
-Retomaremos o que foi feito acima, excluiremos as ações que adicionamos e, em vez da frase fixa, em "Solicitação", usaremos as tags **\#commande\#** e **\#equipement\#**. Portanto, a Jeedom substituirá essas tags pelo nome dos comandos e pelo nome do equipamento (podemos ver a importância de ter nomes consistentes de comando / equipamento).
+Retomaremos o que foi feito acima, excluiremos as ações que adicionamos e, em vez da frase fixa, em "Solicitação", usaremos as tags **\#commande\#** E **\#equipement\#**. Portanto, a Jeedom substituirá essas tags pelo nome dos comandos e pelo nome do equipamento (podemos ver a importância de ter nomes consistentes de comando / equipamento).
 
 ![interact006](../images/interact006.png)
 
@@ -177,7 +177,7 @@ Podemos imaginar que um alarme pode ser ativado ou desativado por uma criança o
 
 ### Exclusão regexp
 
-É possível criar [Regexp](https://fr.wikipedia.org/wiki/Expression_rationnelle) exclusão, se uma frase gerada corresponder a este Regexp, ela será excluída. O interesse é ser capaz de remover falsos positivos, ou seja, uma sentença gerada pelo Jeedom que ativa algo que não corresponde ao que queremos ou que interferiria em outra interação que teria uma sentença semelhante.
+É possível criar [Expressão regular](https://fr.wikipedia.org/wiki/Expression_rationnelle) exclusão, se uma frase gerada corresponder a este Regexp, ela será excluída. O interesse é ser capaz de remover falsos positivos, ou seja, uma sentença gerada pelo Jeedom que ativa algo que não corresponde ao que queremos ou que interferiria em outra interação que teria uma sentença semelhante.
 
 Temos 2 lugares para aplicar um Regexp :
 - Na interação, mesmo no campo "Regexp exclusion"".
@@ -297,7 +297,7 @@ Isso permite que você exclua todos os comandos que possuem uma dessas palavras 
 
 ![interact022](../images/interact022.png)
 
-Como podemos ver, existe aqui no pedido a tag **\#consigne\#** (você pode colocar o que deseja), incluído no controle do inversor, para aplicar o valor desejado. Para fazer isso, temos 3 partes : \* Solicitar : em que criamos uma tag que representará o valor que será enviado para a interação. \* Resposta : reutilizamos a tag da resposta para garantir que o Jeedom entenda corretamente a solicitação. \* Ações : colocamos uma ação na lâmpada que queremos acionar e, no valor que passamos, nossa tag *ordem*.
+Como podemos ver, existe aqui no pedido a tag **\#consigne\#** (você pode colocar o que deseja), incluído no controle do inversor, para aplicar o valor desejado. Para fazer isso, temos 3 partes : \* Solicitar : em que criamos uma tag que representará o valor que será enviado para a interação. \* Resposta : reutilizamos a tag da resposta para garantir que o Jeedom entenda corretamente a solicitação. \* Ação : colocamos uma ação na lâmpada que queremos acionar e, no valor que passamos, nossa tag *ordem*.
 
 > **Observação**
 >

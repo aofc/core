@@ -45,7 +45,7 @@ class scenario {
 	private $_realTriggerValue = '';
 	/** @var bool */
 	private $_return = true;
-	private $_tags = array();
+	private $_tags = array('#trigger#' => '','#trigger_name#' => '','#trigger_id#' => '','#trigger_message#' => '','#trigger_value#' => '');
 	private $_do = true;
 	private $_changed = false;
 
@@ -76,7 +76,7 @@ class scenario {
 
 	/**
 	 * Renvoie tous les objets scenario
-	 * @return [] scenario object scenario
+	 * @return scenario[]
 	 */
 	public static function all($_group = '') {
 		$values = array();
@@ -174,7 +174,7 @@ class scenario {
 	}
 	/**
 	 * return all scenarios ordered by [group][objectName][scenarioName]
-	 * @return [] array of scenario object
+	 * @return scenario[]
 	 */
 	public static function allOrderedByGroupObjectName($_asGroup = false) {
 		$scenarioList = array();
@@ -342,23 +342,24 @@ class scenario {
 		if (config::byKey('enableScenario') != 1) {
 			return;
 		}
-		$message = '';
+		$datetime = date('Y-m-d H:i:s');
+		$trigger_message = '';
 		if ($_event !== null) {
 			//check from a cmd event:
 			$scenarios = array();
 			if (is_object($_event)) {
 				$scenarios1 = self::byTrigger($_event->getId());
 				$trigger = '#' . $_event->getId() . '#';
-				$message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnEvent']['txt'] . $_event->getHumanName();
+				$trigger_message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnEvent']['txt'] . $_event->getHumanName();
 				if ($_value !== null) {
-					$message .= ' (' . $_value . ')';
+					$trigger_message .= ' (' . $_value . ')';
 				}
 			} else {
 				$scenarios1 = self::byTrigger($_event);
 				$trigger = $_event;
-				$message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startOnEvent']['txt'] . ' : #' . $_event . '#';
+				$trigger_message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startOnEvent']['txt'] . ' : #' . $_event . '#';
 				if ($_value !== null) {
-					$message .= ' (' . $_value . ')';
+					$trigger_message .= ' (' . $_value . ')';
 				}
 			}
 
@@ -368,13 +369,22 @@ class scenario {
 				if (is_array($scenarios2) && count($scenarios2) > 0) {
 					foreach ($scenarios2 as $scenario) {
 						if ($scenario->testTrigger($trigger)) {
-							$message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnEvent']['txt'];
+							$trigger_message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnEvent']['txt'];
 							if (is_object($_object)) {
-								$message .= ' genericType(' . $_generic . ',#[' . $_object->getName() . ']#) from ' . $_event->getHumanName();
+								$trigger_message .= ' genericType(' . $_generic . ',#[' . $_object->getName() . ']#) from ' . $_event->getHumanName();
 							} else {
-								$message .= ' genericType(' . $_generic . ')' . ' from ' . $_event->getHumanName();
+								$trigger_message .= ' genericType(' . $_generic . ')' . ' from ' . $_event->getHumanName();
 							}
-							$scenario->launch($trigger, $message, $_forceSyncMode);
+							$scenario->addTag('trigger_message',$trigger_message);
+							$scenario->addTag('trigger_value',$_value);
+							if (is_object($_event)) {
+								$scenario->addTag('trigger_name',trim($_event->getHumanName(),'#'));
+								$scenario->addTag('trigger_id',$_event->getId());
+								$scenario->addTag('trigger',get_class($_event));
+							}else{
+								$scenario->addTag('trigger',trim($_event,'#'));
+							}
+							$scenario->launch($_forceSyncMode);
 						}
 					}
 				}
@@ -388,14 +398,14 @@ class scenario {
 				}
 			}
 		} else {
-			$message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnShedule']['txt'];
+			$trigger_message = $GLOBALS['JEEDOM_SCLOG_TEXT']['startAutoOnShedule']['txt'];
 			$scenarios = scenario::schedule();
-			$trigger = 'schedule';
+			$_event = 'schedule';
 			if (jeedom::isDateOk()) {
 				foreach ($scenarios as $key => &$scenario) {
 					if ($scenario->getState() == 'in progress' && $scenario->getConfiguration('allowMultiInstance', 0) == 0) {
 						unset($scenarios[$key]);
-					} else if (!$scenario->isDue()) {
+					} else if (!$scenario->isDue($datetime)) {
 						unset($scenarios[$key]);
 					}
 				}
@@ -404,7 +414,22 @@ class scenario {
 
 		if (count($scenarios) > 0) {
 			foreach ($scenarios as $scenario_) {
-				$scenario_->launch($trigger, $message, $_forceSyncMode, $_options);
+				$scenario_->addTag('trigger_message',$trigger_message);
+				
+				$scenario_->addTag('trigger_value',$_value);
+				if (is_object($_event)) {
+					$scenario_->addTag('trigger_name',trim($_event->getHumanName(),'#'));
+					$scenario_->addTag('trigger_id',$_event->getId());
+					$scenario_->addTag('trigger',get_class($_event));
+				}else{
+					$scenario_->addTag('trigger',$_event);
+				}
+				if (is_array($_options) && count($_options) > 0) {
+					foreach ($_options as $key => $value) {
+						$scenario_->addTag($key,$value);
+					}
+				}
+				$scenario_->launch($_forceSyncMode);
 			}
 		}
 		return true;
@@ -451,7 +476,7 @@ class scenario {
 		$scenario->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['startSubTask']['txt']);
 		if (isset($_options['tags']) && is_array($_options['tags']) && count($_options['tags']) > 0) {
 			$scenario->setTags($_options['tags']);
-			$scenario->setLog(__('Tags :', __FILE__) . ' ' . json_encode($scenario->getTags()));
+			$scenario->setLog(__('Tags :', __FILE__) . ' ' . json_encode($scenario->getTags(), JSON_UNESCAPED_UNICODE));
 		}
 		if (!is_object($scenarioElement) || !is_object($scenario)) {
 			$scenario->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['toStartUnfound']['txt']);
@@ -660,6 +685,9 @@ class scenario {
 	 * @return string|object|array return value will depends on $_input received
 	 */
 	public static function fromHumanReadable($_input) {
+		if(empty($_input)){
+			return $_input;
+		}
 		$isJson = false;
 		if (is_json($_input)) {
 			$isJson = true;
@@ -802,12 +830,10 @@ class scenario {
 	}
 	/**
 	 *
-	 * @param string $_trigger
-	 * @param string $_message
 	 * @param boolean $_forceSyncMode
 	 * @return boolean
 	 */
-	public function launch($_trigger = '', $_message = '', $_forceSyncMode = false, $_options = null) {
+	public function launch($_forceSyncMode = false) {
 		if (config::byKey('enableScenario') != 1 || $this->getIsActive() != 1) {
 			return false;
 		}
@@ -841,28 +867,18 @@ class scenario {
 		if ($state == 'in progress' && $this->getConfiguration('allowMultiInstance', 0) == 0) {
 			return false;
 		}
-		if (is_array($_options) && count($_options) > 0) {
-			$tags = $this->getTags();
-			if (!is_array($tags)) {
-				$tags = array();
-			}
-			foreach ($_options as $key => $value) {
-				$tags[$key] = $value;
-			}
-			$this->setTags($tags);
-		}
 		$this->setCache(array('startingTime' => strtotime('now'), 'state' => 'starting'));
 		if ($this->getConfiguration('syncmode') == 1 || $_forceSyncMode) {
 			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['launchScenarioSync']['txt']);
-			return $this->execute($_trigger, $_message);
+			return $this->execute();
 		} else {
-			if (count($this->getTags()) > 0) {
-				$this->setCache('tags', $this->getTags());
-			}
+			$instance_id = config::genKey(16);
+			cache::set('scenarioInstanceAttr'.$this->getId().'::'.$instance_id,array(
+				'tags' => $this->getTags()
+			));
 			$cmd = __DIR__ . '/../../core/php/jeeScenario.php ';
 			$cmd .= ' scenario_id=' . $this->getId();
-			$cmd .= ' trigger=' . escapeshellarg($_trigger);
-			$cmd .= ' "message=' . escapeshellarg(sanitizeAccent(addslashes($_message))) . '"';
+			$cmd .= ' intance_id='.$instance_id;
 			$cmd .= ' >> ' . log::getPathToLog('scenario_execution') . ' 2>&1 &';
 			system::php($cmd);
 		}
@@ -870,20 +886,18 @@ class scenario {
 	}
 	/**
 	 *
-	 * @param string $_trigger
-	 * @param string $_message
+	 * @param string $instance_id
 	 */
-	public function execute($_trigger = '', $_message = '') {
+	public function execute($instance_id = '') {
 		if (config::byKey('enableScenario') != 1) {
 			return;
 		}
-		$tags = $this->getCache('tags');
-		if ($tags != '') {
-			$this->setTags($tags);
-			$this->setCache('tags', '');
+		if($instance_id != ''){
+			$this->setTags(cache::byKey('scenarioInstanceAttr'.$this->getId().'::'.$instance_id)->getValue()['tags']);
+			cache::byKey('scenarioInstanceAttr'.$this->getId().'::'.$instance_id)->remove();
 		}
 		if ($this->getIsActive() != 1) {
-			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['disableScenario']['txt']  . $this->getHumanName() . ' ' . __('sur :', __FILE__) . ' ' . $_message . ' ' . __('car il est désactivé', __FILE__));
+			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['disableScenario']['txt']  . $this->getHumanName() . ' ' . __('sur :', __FILE__) . ' ' . $this->getTag('message') . ' ' . __('car il est désactivé', __FILE__));
 			$this->setState('stop');
 			$this->setPID();
 			$this->persistLog();
@@ -898,8 +912,7 @@ class scenario {
 				return;
 			}
 		}
-
-		$cmd = cmd::byId(str_replace('#', '', $_trigger));
+		$cmd = cmd::byId(str_replace('#', '', $this->getTag('trigger_id')));
 		if (is_object($cmd)) {
 			log::add('event', 'info', __('Exécution du scénario', __FILE__) . ' ' . $this->getHumanName() . ' ' . __('déclenché par :', __FILE__) . ' ' . $cmd->getHumanName());
 			if ($this->getConfiguration('timeline::enable')) {
@@ -911,33 +924,29 @@ class scenario {
 				$timeline->setOptions(array('trigger' => $cmd->getHumanName(true)));
 				$timeline->save();
 			}
-			$_triggerValue = $cmd->execCmd();
 		} else {
-			log::add('event', 'info', __('Exécution du scénario', __FILE__) . ' ' . $this->getHumanName() . ' ' . __('déclenché par :', __FILE__) . ' ' . $_trigger);
+			log::add('event', 'info', __('Exécution du scénario', __FILE__) . ' ' . $this->getHumanName() . ' ' . __('déclenché par :', __FILE__) . ' ' . $this->getTag('trigger'));
 			if ($this->getConfiguration('timeline::enable')) {
 				$timeline = new timeline();
 				$timeline->setType('scenario');
 				$timeline->setFolder($this->getConfiguration('timeline::folder'));
 				$timeline->setLink_id($this->getId());
 				$timeline->setName($this->getHumanName(true, true, true, true));
-				$timeline->setOptions(array('trigger' => ($_trigger == 'schedule') ? 'programmation' : $_trigger));
+				$timeline->setOptions(array('trigger' => ($this->getTag('trigger') == 'schedule') ? 'programmation' : $this->getTag('trigger')));
 				$timeline->save();
 			}
-			$_triggerValue = 'none';
 		}
 		if ($this->getState() == 'in progress' && $this->getConfiguration('allowMultiInstance', 0) == 0) {
 			return;
 		}
 		if (count($this->getTags()) == 0) {
-			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['start']['txt'] . ' ' . trim($_message, "'") . '.');
+			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['start']['txt'] . ' ' . $this->getTag('message') . '.');
 		} else {
-			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['start']['txt'] . ' ' . trim($_message, "'") . '. Tags : ' . json_encode($this->getTags()));
+			$this->setLog($GLOBALS['JEEDOM_SCLOG_TEXT']['start']['txt'] . ' ' . $this->getTag('message') . '. Tags : ' . json_encode($this->getTags(), JSON_UNESCAPED_UNICODE));
 		}
 		$this->setLastLaunch(date('Y-m-d H:i:s'));
 		$this->setState('in progress');
 		$this->setPID(getmypid());
-		$this->setRealTrigger($_trigger);
-		$this->setRealTriggerValue($_triggerValue);
 		foreach (($this->getElement()) as $element) {
 			if (!$this->getDo()) {
 				break;
@@ -953,7 +962,7 @@ class scenario {
 	/**
 	 *
 	 * @param string $_name
-	 * @return \scenario
+	 * @return scenario
 	 */
 	public function copy($_name) {
 		$scenarioCopy = clone $this;
@@ -979,12 +988,6 @@ class scenario {
 	public function toHtml($_version) {
 		if (!$this->hasRight('r')) {
 			return '';
-		}
-		if (config::byKey('widget::disableCache', 'core', 0) == 0) {
-			$mc = cache::byKey('scenarioHtml' . $_version . $this->getId());
-			if ($mc->getValue() != '') {
-				return $mc->getValue();
-			}
 		}
 		$version = jeedom::versionAlias($_version);
 		$name = ($this->getDisplay('name') != '') ? $this->getDisplay('name') : $this->getName();
@@ -1018,19 +1021,13 @@ class scenario {
 		}
 		$html = template_replace($replace, self::$_templateArray[$version]);
 		$html =  translate::exec($html, 'core/template/widgets.html');
-		if (config::byKey('widget::disableCache', 'core', 0) == 0) {
-			cache::set('scenarioHtml' . $version . $this->getId(), $html);
-		}
 		return $html;
 	}
 	/**
 	 *
 	 */
 	public function emptyCacheWidget() {
-		$mc = cache::byKey('scenarioHtmldashboard' . $this->getId());
-		$mc->remove();
-		$mc = cache::byKey('scenarioHtmlmobile' . $this->getId());
-		$mc->remove();
+		
 	}
 	/**
 	 *
@@ -1106,7 +1103,6 @@ class scenario {
 			$this->setLastLaunch($calculateScheduleDate['prevDate']);
 		}
 		DB::save($this);
-		$this->emptyCacheWidget();
 		if ($this->_changeState) {
 			$this->_changeState = false;
 			event::add('scenario::update', array('scenario_id' => $this->getId(), 'isActive' => $this->getIsActive(), 'state' => $this->getState(), 'lastLaunch' => $this->getLastLaunch(), 'name' => $this->getName(), 'icon' => $this->getIcon()));
@@ -1124,7 +1120,6 @@ class scenario {
 		foreach (($this->getElement()) as $element) {
 			$element->remove();
 		}
-		$this->emptyCacheWidget();
 		if (file_exists(__DIR__ . '/../../log/scenarioLog/scenario' . $this->getId() . '.log')) {
 			unlink(__DIR__ . '/../../log/scenarioLog/scenario' . $this->getId() . '.log');
 		}
@@ -1191,6 +1186,15 @@ class scenario {
 					$c = new Cron\CronExpression(checkAndFixCron($schedule), new Cron\FieldFactory);
 					$calculatedDate_tmp['prevDate'] = $c->getPreviousRunDate()->format('Y-m-d H:i:s');
 					$calculatedDate_tmp['nextDate'] = $c->getNextRunDate()->format('Y-m-d H:i:s');
+					$schedule_exp = explode(' ',trim($schedule));
+					if(is_array($schedule_exp) && count($schedule_exp) == 6 ){
+					 	if($schedule_exp[5] != $c->getPreviousRunDate()->format('Y')){
+							$calculatedDate['prevDate'] = '';
+						}
+						if($schedule_exp[5] != $c->getNextRunDate()->format('Y')){
+							$calculatedDate['nextDate'] = '';
+						}
+					}
 				} catch (Exception $exc) {
 				} catch (Error $exc) {
 				}
@@ -1206,78 +1210,38 @@ class scenario {
 				$c = new Cron\CronExpression(checkAndFixCron($this->getSchedule()), new Cron\FieldFactory);
 				$calculatedDate['prevDate'] = $c->getPreviousRunDate()->format('Y-m-d H:i:s');
 				$calculatedDate['nextDate'] = $c->getNextRunDate()->format('Y-m-d H:i:s');
+				$schedule = explode(' ',$this->getSchedule());
+				if(count($schedule) == 6 && $schedule[5] != $c->getPreviousRunDate()->format('Y')){
+					$calculatedDate['prevDate'] = '';
+				}
+				if(count($schedule) == 6 && $schedule[5] != $c->getNextRunDate()->format('Y')){
+					$calculatedDate['nextDate'] = '';
+				}
 			} catch (Exception $exc) {
 			} catch (Error $exc) {
 			}
 		}
+		
 		return $calculatedDate;
 	}
+
 	/**
 	 *
 	 * @return boolean
 	 */
-	public function isDue() {
-		if (((new DateTime('today midnight +1 day'))->format('I') - (new DateTime('today midnight'))->format('I')) == -1 && date('G') > 0 && date('G') < 4) {
-			return false;
-		}
+	public function isDue($_datetime = null) {
 		$last = strtotime($this->getLastLaunch());
 		$now = time();
-		$now = ($now - $now % 60);
-		$last = ($last - $last % 60);
-		if ($now == $last) {
+		if (($now - $now % 60) == ($last - $last % 60)) {
 			return false;
 		}
-		if (is_array($this->getSchedule())) {
-			foreach (($this->getSchedule()) as $schedule) {
-				try {
-					$c = new Cron\CronExpression(checkAndFixCron($schedule), new Cron\FieldFactory);
-					try {
-						if ($c->isDue()) {
-							return true;
-						}
-					} catch (Exception $e) {
-					} catch (Error $e) {
-					}
-					try {
-						$prev = $c->getPreviousRunDate()->getTimestamp();
-					} catch (Exception $e) {
-						continue;
-					} catch (Error $e) {
-						continue;
-					}
-					$lastCheck = strtotime($this->getLastLaunch());
-					$diff = abs((strtotime('now') - $prev) / 60);
-					if ($lastCheck <= $prev && $diff <= config::byKey('maxCatchAllow') || config::byKey('maxCatchAllow') == -1) {
-						return true;
-					}
-				} catch (Exception $e) {
-				} catch (Error $e) {
-				}
-			}
-		} else {
-			try {
-				$c = new Cron\CronExpression(checkAndFixCron($this->getSchedule()), new Cron\FieldFactory);
-				try {
-					if ($c->isDue()) {
-						return true;
-					}
-				} catch (Exception $e) {
-				} catch (Error $e) {
-				}
-				try {
-					$prev = $c->getPreviousRunDate()->getTimestamp();
-				} catch (Exception $e) {
-					return false;
-				} catch (Error $e) {
-					return false;
-				}
-				$lastCheck = strtotime($this->getLastLaunch());
-				$diff = abs((strtotime('now') - $prev) / 60);
-				if ($lastCheck <= $prev && $diff <= config::byKey('maxCatchAllow') || config::byKey('maxCatchAllow') == -1) {
-					return true;
-				}
-			} catch (Exception $exc) {
-			} catch (Error $exc) {
+		$schedules = $this->getSchedule();
+		if(!is_array($schedules)){
+			$schedules = [$schedules];
+		}
+		foreach ($schedules as $schedule) {
+			if(cronIsDue($schedule,$_datetime,$this->getLastLaunch())){
+				return true;
 			}
 		}
 		return false;
@@ -1309,7 +1273,7 @@ class scenario {
 						$cron->halt();
 						$cron->remove();
 					} catch (Exception $e) {
-						log::add('scenario', 'info', __('Impossible d\'arrêter la sous tâche :', __FILE__) . ' ' . json_encode($cron->getOption()));
+						log::add('scenario', 'info', __('Impossible d\'arrêter la sous tâche :', __FILE__) . ' ' . json_encode($cron->getOption(), JSON_UNESCAPED_UNICODE));
 					}
 				}
 			}
@@ -1593,9 +1557,6 @@ class scenario {
 		if (isset($_data['node']['scenario' . $this->getId()])) {
 			return;
 		}
-		if ($_level > 2) {
-			return $_data;
-		}
 		$_level++;
 		if ($_level > $_drill) {
 			return $_data;
@@ -1679,6 +1640,27 @@ class scenario {
 		}
 	}
 
+	public function addTag($_key,$value){
+		$tag = $this->getTags();
+		$_key = '#'.trim($_key,'#').'#';
+		$tag[$_key] = $value;
+		$this->setTags($tag);
+	}
+
+	public function getTag($_key,$_default = ''){
+		$tag = $this->getTags();
+		if(isset($tag[$_key])){
+			return $tag[$_key];
+		}
+		if(isset($tag[trim($_key,'#')])){
+			return $tag[trim($_key,'#')];
+		}
+		if(isset($tag['#'.trim($_key,'#').'#'])){
+			return $tag['#'.trim($_key,'#').'#'];
+		}
+		return $_default;
+	}
+
 	/*     * **********************Getteur Setteur*************************** */
 	/**
 	 *
@@ -1730,6 +1712,7 @@ class scenario {
 	 */
 	public function setName($_name) {
 		$_name = cleanComponanteName($_name);
+		$_name = trim($_name);
 		if ($_name != $this->getName()) {
 			$this->_changeState = true;
 			$this->_changed = true;
@@ -1769,7 +1752,6 @@ class scenario {
 	 */
 	public function setState($state) {
 		if ($this->getCache('state') != $state) {
-			$this->emptyCacheWidget();
 			event::add('scenario::update', array('scenario_id' => $this->getId(), 'state' => $state, 'lastLaunch' => $this->getLastLaunch()));
 		}
 		$this->setCache('state', $state);
@@ -1811,7 +1793,7 @@ class scenario {
 	}
 	/**
 	 *
-	 * @return string/object
+	 * @return string|object
 	 */
 	public function getSchedule() {
 		return is_json($this->schedule, $this->schedule);
@@ -1893,7 +1875,7 @@ class scenario {
 	}
 	/**
 	 *
-	 * @param string|int $timeout
+	 * @param string|int $_timeout
 	 * @return $this
 	 */
 	public function setTimeout($_timeout) {
@@ -1975,7 +1957,7 @@ class scenario {
 	}
 	/**
 	 *
-	 * @param string $description
+	 * @param string $_description
 	 * @return $this
 	 */
 	public function setDescription($_description) {
@@ -2004,40 +1986,7 @@ class scenario {
 		$this->configuration = $configuration;
 		return $this;
 	}
-	/**
-	 *
-	 * @return string
-	 */
-	public function getRealTrigger() {
-		return $this->_realTrigger;
-	}
-	/**
-	 *
-	 * @param string $_realTrigger
-	 * @return $this
-	 */
-	public function setRealTrigger($_realTrigger) {
-		$this->_realTrigger = $_realTrigger;
-		return $this;
-	}
-	/**
-	 *
-	 * @return string
-	 */
-	public function getRealTriggerValue() {
-		return $this->_realTriggerValue;
-	}
-	/**
-	 *
-	 * @param string $_realTriggerValue
-	 * @return $this
-	 */
-	public function setRealTriggerValue($_realTriggerValue) {
-		$this->_realTriggerValue = $_realTriggerValue;
-		return $this;
-	}
-
-
+	
 	/**
 	 * getReturn
 	 *
@@ -2062,6 +2011,9 @@ class scenario {
 	 * @return array
 	 */
 	public function getTags() {
+		if(!is_array($this->_tags)){
+			return [];
+		}
 		return $this->_tags;
 	}
 

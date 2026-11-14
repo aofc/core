@@ -33,8 +33,11 @@ $_USER_GLOBAL = null;
 /** @var bool $_RESTRICTED */
 global $_RESTRICTED;
 $_RESTRICTED = false;
+
+
 if (init('type') != '') {
 	try {
+		
 		if (init('type') == 'ask') {
 			if (trim(init('token')) == '' || strlen(init('token')) < 64) {
 				throw new Exception(__('Commande inconnue ou Token invalide', __FILE__));
@@ -59,6 +62,13 @@ if (init('type') != '') {
 			user::failedLogin();
 			sleep(5);
 			throw new Exception(__('Vous n\'êtes pas autorisé à effectuer cette action, IP :', __FILE__) . ' ' . getClientIp());
+		}
+
+		if(config::byKey('api::forbidden::method', 'core', '') !== '' && preg_match(config::byKey('api::forbidden::method', 'core', ''), init('type'))){
+			throw new Exception(__('Cette demande n\'est pas autorisée', __FILE__) . ' ' . getClientIp());
+		}
+		if(config::byKey('api::allow::method', 'core', '') !== '' && !preg_match(config::byKey('api::allow::method', 'core', ''), init('type'))){
+			throw new Exception(__('Cette demande n\'est pas autorisée', __FILE__) . ' ' . getClientIp());
 		}
 		$type = init('type');
 		log::add('api', 'debug', __('Demande sur l\'api http venant de :', __FILE__) . ' ' . getClientIp() . ' => ' . json_encode($_GET));
@@ -164,7 +174,9 @@ if (init('type') != '') {
 					} else if (is_array(init('tags'))) {
 						$scenario->setTags(init('tags'));
 					}
-					$scenario_return = $scenario->launch('api', __('Exécution provoquée par un appel API', __FILE__) . ' ');
+					$scenario->addTag('trigger','api');
+					$scenario->addTag('trigger_message',__('Scénario exécuté sur appel API', __FILE__));
+					$scenario_return = $scenario->launch();
 					if (is_string($scenario_return)) {
 						$return = $scenario_return;
 					}
@@ -225,7 +237,7 @@ if (init('type') != '') {
 		if ($type == 'fullData') {
 			log::add('api', 'debug', __('Demande API pour les commandes', __FILE__));
 			header('Content-Type: application/json');
-			echo json_encode(jeeObject::fullData(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE, 1024);
+			echo json_encode(jeeObject::fullData(null,$_USER_GLOBAL), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE, 1024);
 			die();
 		}
 		if ($type == 'variable') {
@@ -267,6 +279,13 @@ try {
 	if ($jsonrpc->getJsonrpc() != '2.0') {
 		user::failedLogin();
 		throw new Exception(__('Requête invalide. Version JSON-RPC invalide :', __FILE__) . ' ' . $jsonrpc->getJsonrpc(), -32001);
+	}
+
+	if(config::byKey('api::forbidden::method', 'core', '') !== '' && preg_match(config::byKey('api::forbidden::method', 'core', ''), $jsonrpc->getMethod())){
+		throw new Exception(__('Cette demande n\'est pas autorisée', __FILE__));
+	}
+	if(config::byKey('api::allow::method', 'core', '') !== '' && !preg_match(config::byKey('api::allow::method', 'core', ''), $jsonrpc->getMethod())){
+		throw new Exception(__('Cette demande n\'est pas autorisée', __FILE__) . ' ' . getClientIp());
 	}
 
 	$params = $jsonrpc->getParams();
@@ -721,7 +740,7 @@ try {
 	if ($jsonrpc->getMethod() == 'cmd::byId') {
 		$cmd = cmd::byId($params['id']);
 		if (!is_object($cmd)) {
-			throw new Exception(__('Cmd introuvable :', __FILE__) . ' ' . secureXSS($params['id']), -32701);
+			throw new Exception(__('Commande introuvable :', __FILE__) . ' ' . secureXSS($params['id']), -32701);
 		}
 		if (is_object($_USER_GLOBAL) && !$cmd->hasRight($_USER_GLOBAL)) {
 			throw new Exception(__('Vous n\'avez pas les droits sur cette commande', __FILE__), -32701);
@@ -890,7 +909,9 @@ try {
 			$jsonrpc->makeSuccess($scenario->stop());
 		}
 		if ($params['state'] == 'run') {
-			$jsonrpc->makeSuccess($scenario->launch('api', __('Scénario exécuté sur appel API', __FILE__)));
+			$scenario->addTag('trigger','api');
+			$scenario->addTag('trigger_message',__('Scénario exécuté sur appel API', __FILE__));
+			$jsonrpc->makeSuccess($scenario->launch());
 		}
 		if ($params['state'] == 'enable') {
 			$scenario->setIsActive(1);
@@ -988,7 +1009,6 @@ try {
 			$params['log'],
 			$params['position'],
 			$params['search'],
-			$params['position'],
 			$params['colored'],
 			$params['numbered'],
 			$params['numStart'],
@@ -1392,7 +1412,15 @@ try {
 	/*         * *********Catch exeption*************** */
 } catch (Exception $e) {
 	$message = $e->getMessage();
-	$jsonrpc = new jsonrpc(init('request'));
+	if(!isset($jsonrpc) || !is_object($jsonrpc)){
+		if(!isset($request)){
+			$request = init('request');
+			if ($request == '') {
+				$request = file_get_contents("php://input");
+			}
+		}
+		$jsonrpc = new jsonrpc($request);
+	}
 	$errorCode = (is_numeric($e->getCode())) ? -32000 - $e->getCode() : -32599;
 	log::add('api', 'info', 'Error code ' . $errorCode . ' : ' . secureXSS($message));
 	$jsonrpc->makeError($errorCode, $message);

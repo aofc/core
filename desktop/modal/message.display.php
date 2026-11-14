@@ -65,7 +65,7 @@ if ($selectPlugin != '') {
         $trs .= '<td><div class="center"><i class="far fa-trash-alt cursor removeMessage"></i></div></td>';
         $trs .= '<td class="datetime">' . $message->getDate() . '</td>';
         $trs .= '<td class="plugin">' . $message->getPlugin() . '</td>';
-        $trs .= '<td class="message">' . $message->getMessage(true) . '</td>';
+        $trs .= '<td class="message">' . nl2br($message->getMessage(true)) . '</td>';
         $trs .= '<td class="message_action">' . $message->getAction(true) . '</td>';
         $trs .= '<td class="occurrences" style="text-align: center">' . $message->getOccurrences() . '</td>';
         $trs .= '</tr>';
@@ -80,7 +80,7 @@ if ($selectPlugin != '') {
 (function() {// Self Isolation!
 
   jeedomUtils.hideAlert()
-  jeedomUtils.initDataTables('#md_messageDisplay', false, false)
+  jeedomUtils.initDataTables('#md_messageDisplay', false, false,[{ select: 1, sort: "desc" }])
 
   let table = document.querySelector('#md_messageDisplay #table_message')
   let msgDataTable = table._dataTable
@@ -101,6 +101,8 @@ if ($selectPlugin != '') {
         },
         success: function() {
           document.querySelector("#table_message tbody").empty()
+          document.getElementById("table_message").triggerEvent('update')
+          msgDataTable.refresh()
           jeedom.refreshMessageNumber()
         }
       })

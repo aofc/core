@@ -47,6 +47,7 @@ if (!isConnect()) {
   <option value="genericType">{{Type générique}}</option>
   <option value="changeTheme">{{Changer de thème}}</option>
 </select>
+<input id="mod_actionValue_fil" class="form-control" placeholder="{{Filtre des commandes}}">
 <br />
 <div class="alert alert-info mod_actionValue_selDescription sleep" style="display:none;">
   {{Pause de x seconde(s)}}
@@ -85,11 +86,11 @@ if (!isConnect()) {
 </div>
 
 <div class="alert alert-info mod_actionValue_selDescription message" style="display:none;">
-  {{Permet d'ajouter une message dans le centre de message}}
+  {{Permet d'ajouter un message dans le centre de message}}
 </div>
 
 <div class="alert alert-info mod_actionValue_selDescription equipement">
-  {{Permet de modifier les proriétés visible/invisible actif/inactif d'un équipement}}
+  {{Permet de modifier les propriétés d'un équipement (visible/invisible actif/inactif)}}
 </div>
 
 <div class="alert alert-info mod_actionValue_selDescription ask" style="display:none;">
@@ -125,7 +126,7 @@ if (!isConnect()) {
 </div>
 
 <div class="alert alert-info mod_actionValue_selDescription remove_inat" style="display:none;">
-  {{Permet de supprimer la programmation de tous les blocs DANS et A du scénario}}
+  {{Permet de supprimer la programmation de tous les blocs DANS et A d'un scénario}}
 </div>
 
 <div class="alert alert-info mod_actionValue_selDescription event" style="display:none;">
@@ -179,5 +180,26 @@ if (!isConnect()) {
       document.querySelectorAll('.mod_actionValue_selDescription').unseen()
       document.querySelector('.mod_actionValue_selDescription.' + value).seen()
     })
+
+    const select = document.getElementById('mod_actionValue_sel')
+    const input = document.getElementById('mod_actionValue_fil')
+    const allOptions = Array.from(select.options)
+                                                                                      
+    function filterOptions() {
+      const text = input.value.trim().toLowerCase().stripAccents()
+
+      select.innerHTML = ''
+
+      allOptions
+        .filter(option => {
+          const optionText = option.textContent.toLowerCase().stripAccents()
+          return text === '' || optionText.includes(text)
+        })
+        .forEach(option => {
+          select.add(option.cloneNode(true))
+        })
+    }
+                                                                                      
+    input.addEventListener('input', filterOptions)                                                                                                                        
   })()
 </script>

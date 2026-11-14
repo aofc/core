@@ -325,8 +325,10 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                 <label class="col-lg-2 col-md-3 col-sm-4 col-xs-6 control-label">{{Plugin(s)}} <?php echo $key; ?></label>
                 <div class="col-lg-10 col-md-9 col-sm-8 col-xs-6">
                   <?php
-                  foreach ($values as $value) {
-                    echo '<span class="btn btn-xs btn-info">' . $value->getName() . '</span><br/>';
+                  if (is_iterable($values)) {
+                    foreach ($values as $value) {
+                      echo '<span class="btn btn-xs btn-info">' . $value->getName() . '</span><br/>';
+                    }
                   }
                   ?>
                 </div>
@@ -349,7 +351,12 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                   <sup><i class="fas fa-question-circle" title="#value# = {{valeur de la commande}}"></i></sup>
                 </label>
                 <div class="col-sm-6">
-                  <input class="cmdAttr form-control" data-l1key="configuration" data-l2key="calculValueOffset" />
+                  <div class="input-group">
+                    <input class="cmdAttr form-control roundedLeft" data-l1key="configuration" data-l2key="calculValueOffset" />
+                    <span class="input-group-btn">
+                      <a class="btn btn-default roundedRight cursor tooltips" id="bt_searchInfoCmdCalculValue" title="{{Rechercher une commande}}"><i class="fas fa-list-alt"></i></a>
+                    </span>
+                  </div>
                 </div>
               </div>
               <?php if ($cmd->getSubType() == 'numeric') { ?>
@@ -358,7 +365,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                     <sup><i class="fas fa-question-circle" title="{{Nombre de décimales}}"></i></sup>
                   </label>
                   <div class="col-sm-6">
-                    <input class="cmdAttr form-control" data-l1key="configuration" data-l2key="historizeRound" />
+                    <input class="cmdAttr form-control" data-l1key="configuration" data-l2key="historizeRound" type="number" min="0" max="9" step="1" maxlength="1" oninput="this.value = this.value.slice(0, 1)"/>
                   </div>
                 </div>
               <?php }
@@ -511,6 +518,20 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                   </select>
                 </div>
               </div>
+              <div class="form-group">
+                <label class="col-md-3 col-sm-3 control-label">{{Limiter à une valeur toute les}}
+                <sup><i class="fas fa-question-circle" title="{{Limiter le nombre de valeurs historisées par la commande en temps réel (avant le lissage de la nuit). Attention un mode de lissage doit absolument être défini.}}"></i></sup>
+                </label>
+                <div class="col-sm-6">
+                  <select class="form-control cmdAttr" data-l1key="configuration" data-l2key="history::smooth">
+                    <option value="">{{Default}}</option>
+                    <option value="-1">{{Aucun}}</option>
+                    <option value="60">{{1 min}}</option>
+                    <option value="300">{{5 min}}</option>
+                    <option value="600">{{10 min}}</option>
+                  </select>
+                </div>
+              </div>
               <?php }
               ?>
               <div class="form-group">
@@ -560,17 +581,17 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                     <option value="high::year">{{Maximum par année}}</option>
                   </select>
                 </div>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                   <select class="form-control cmdAttr" data-l1key="display" data-l2key="graphType">
                     <option value="line">{{Ligne}}</option>
                     <option value="area">{{Aire}}</option>
                     <option value="column">{{Barre}}</option>
                   </select>
                 </div>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                   {{Variation}}&nbsp;<input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="graphDerive" />
                   </div>
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                   {{Escalier}}&nbsp;<input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="graphStep" />
                 </div>
               </div>
@@ -685,7 +706,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
             <fieldset>
               <legend><i class="fas fa-plus"></i> {{Autres}}</legend>
               <div class="form-group">
-                <label class="col-md-2 col-sm-3 control-label">{{M'alerter au retour à la normal}}</label>
+                <label class="col-md-2 col-sm-3 control-label">{{M'alerter au retour à la normale}}</label>
                 <div class="col-sm-6">
                   <input type="checkbox" class="cmdAttr form-control tooltips" data-l1key="configuration" data-l2key="alert::messageReturnBack" />
                 </div>
@@ -839,7 +860,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
                     $tr .= '<input class="form-control key" value="' . $key . '" />';
                     $tr .= '</td>';
                     $tr .= '<td>';
-                    $tr .= '<input class="form-control value" value="' . $value . '" />';
+                    $tr .= '<input class="form-control value" value="' . htmlspecialchars($value, ENT_QUOTES) . '" />';
                     $tr .= '</td>';
                     $tr .= '<td>';
                     $tr .= '<a class="btn btn-danger btn-xs removeWidgetParameter pull-right"><i class="fas fa-times"></i> Supprimer</a>';
@@ -1192,9 +1213,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
 
   (function() { // Self Isolation!
     var jeeM = jeeFrontEnd.md_displayCmdConfigure
-    jeeM.init()
-
-
+    
     //Manage events outside parents delegations:
     document.getElementById('bt_cmdConfigureTest')?.addEventListener('click', function(event) {
       jeedom.cmd.test({
@@ -1452,7 +1471,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
     document.getElementById('cmd_information')?.addEventListener('change', function(event) {
       var _target = null
       if (_target = event.target.closest('.cmdAttr[data-l2key="timeline::enable"]')) {
-        if (this.jeeValue() == 1) {
+        if (_target.jeeValue() == 1) {
           document.querySelectorAll('.cmdAttr[data-l2key="timeline::folder"]').seen()
         } else {
           document.querySelectorAll('.cmdAttr[data-l2key="timeline::folder"]').unseen()
@@ -1474,6 +1493,13 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
     //cmd configuration tab
     document.getElementById('cmd_configuration')?.addEventListener('click', function(event) {
       var _target = null
+
+      if (_target = event.target.closest('#bt_searchInfoCmdCalculValue')) {
+        jeedom.cmd.getSelectModal({cmd: {type: 'info'}}, function(result) {
+          document.querySelectorAll('.cmdAttr[data-l1key=configuration][data-l2key=calculValueOffset]')[0].insertAtCursor(result.human)
+        })
+      }
+
       if (_target = event.target.closest('.bt_removeAction')) {
         _target.closest('.' + _target.getAttribute('data-type')).remove()
         return
@@ -1544,6 +1570,7 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
     //cmd display tab
     document.getElementById('cmd_display')?.addEventListener('click', function(event) {
       var _target = null
+
       if (_target = event.target.closest('#bt_addWidgetParametersCmd')) {
         var tr = '<tr>'
         tr += '<td>'
@@ -1578,6 +1605,8 @@ $configEqDisplayType = jeedom::getConfiguration('eqLogic:displayType');
         return
       }
     })
+
+    jeeM.init()
 
     jeeM.postInit()
   })()

@@ -35,7 +35,7 @@ if (!jeeFrontEnd.connection) {
     },
     goToIndex: function() {
       jeeFrontEnd.connection.animateCss(document.querySelector('.veen'), 'bounceOut', function() {
-        document.querySelectorAll('.veen').hide()
+        document.querySelectorAll('.veen').unseen()
         window.location.href = 'index.php?v=d'
       })
     },
@@ -227,6 +227,28 @@ document.getElementById('wrap')?.addEventListener('click', function(event) {
   if (_target = event.target.closest('#bt_compte_market')) {
     window.open('https://market.jeedom.com/index.php?v=d&p=register', '_blank')
     return
+  }
+
+  if (_target = event.target.closest('a.bt_showPassConnection')) {
+    event.stopPropagation();
+    var _el = event.target.matches('a.bt_showPassConnection') ? event.target : event.target.parentNode;
+    var input = _el.closest('.input-group').querySelector('input');
+    
+    if (input.getAttribute('type') === 'password') {
+        input.setAttribute('type', 'text');
+    } else {
+        input.setAttribute('type', 'password');
+    }
+
+    var icon = _el.querySelector('.fas');
+    if (icon.classList.contains('fa-eye-slash')) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    } else {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    }
+    return;
   }
 })
 

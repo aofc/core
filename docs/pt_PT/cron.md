@@ -22,11 +22,11 @@ Abaixo, você tem a tabela de todas as tarefas existentes (atenção, algumas ta
 Nesta tabela, encontramos :
 
 - **\#** : ID da tarefa, útil para vincular um processo em execução ao que ele realmente faz.
-- **De ativos** : Indica se a tarefa está ativa (pode ser iniciada pelo Jeedom) ou não.
+- **Ativo** : Indica se a tarefa está ativa (pode ser iniciada pelo Jeedom) ou não.
 - **PID** : Indica o ID do processo atual.
 - **Demônio** : Se esta caixa for "sim", a tarefa deve sempre estar em andamento. Além disso, você encontra a frequência do daemon, é aconselhável nunca modificar esse valor e, especialmente, nunca diminuí-lo.
-- **Único** : Se for "sim", a tarefa será iniciada uma vez e será excluída automaticamente.
-- **Classe** : Classe PHP chamada para executar a tarefa (pode estar vazia).
+- **Exclusivo** : Se for "sim", a tarefa será iniciada uma vez e será excluída automaticamente.
+- **Aula** : Classe PHP chamada para executar a tarefa (pode estar vazia).
 - **Função** : Função PHP chamada na classe chamada (ou não, se a classe estiver vazia).
 - **Programação** : Programação da tarefa no formato CRON.
 - **Tempo esgotado** : Tempo máximo de execução da tarefa. Se a tarefa for um daemon, ela será automaticamente interrompida e reiniciada no final do tempo limite.
@@ -34,7 +34,7 @@ Nesta tabela, encontramos :
 - **Última duração** : Último tempo de execução da tarefa (um daemon sempre estará em 0s, não se preocupe, outras tarefas podem estar em 0s).
 - **Status** : Status atual da tarefa (como lembrete, uma tarefa daemon é sempre "executada"").
 
-- **Ações** :
+- **Ação** :
     - **Detalhes** : Veja o cron em detalhes (como armazenado na base).
     - **Iniciar / Parar** : Iniciar ou parar a tarefa (dependendo do status).
     - **Eliminação** : Excluir tarefa.
@@ -48,7 +48,7 @@ Os ouvintes são apenas visíveis na leitura e permitem que você veja as funç�
 
 Tabela de todos os daemons com seu estado, a data do último lançamento, bem como a possibilidade de :
 - Iniciar / reiniciar um daemon.
-- Pare um daemon se o gerenciamento automático estiver desativado.
+- Pare um daemon se o gerenciamento automático estiver desabilitado.
 - Ativar / desativar o gerenciamento automático de um daemon.
 
 > Tip

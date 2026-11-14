@@ -41,7 +41,12 @@ Object.assign(domUtils, {
   },
   registeredEvents: [],
   registeredFuncs: [],
-  headInjexted: []
+  headInjexted: [],
+  controller : new AbortController()
+})
+
+window.addEventListener('beforeunload', function(event) {
+    domUtils.controller.abort()
 })
 
 domUtils.DOMReady = function() {
@@ -189,18 +194,18 @@ NodeList.prototype.getJeeValues = function(_attr, _depth) {
 Element.prototype.setJeeValues = function(_object, _attr) {
   let selector
   for (let i in _object) {
-    selector = _attr + '[data-l1key="' + i + '"]'
+    selector = _attr + '[data-l1key="' + i.replaceAll('"', '') + '"]'
     if ((!is_array(_object[i]) || (this.querySelector(selector) !== null && this.querySelector(selector).getAttribute('multiple') == 'multiple')) && !is_object(_object[i])) {
-      this.querySelectorAll(_attr + '[data-l1key="' + i + '"]').jeeValue(_object[i])
+      this.querySelectorAll(selector).jeeValue(_object[i])
     } else {
       for (let j in _object[i]) {
-        selector = _attr + '[data-l1key="' + i + '"][data-l2key="' + j + '"]'
+        selector = _attr + '[data-l1key="' + i.replaceAll('"', '') + '"][data-l2key="' + j.replaceAll('"', '') + '"]'
         if ((is_array(_object[i][j]) || (this.querySelector(selector) !== null && this.querySelector(selector).getAttribute('multiple') == 'multiple')) || is_object(_object[i][j])) {
           for (let k in _object[i][j]) {
-            this.querySelectorAll(_attr + '[data-l1key="' + i + '"][data-l2key="' + j + '"][data-l3key="' + k + '"]').jeeValue(_object[i][j][k])
+            this.querySelectorAll(selector+'[data-l3key="' + k.replaceAll('"', '') + '"]').jeeValue(_object[i][j][k])
           }
         } else {
-          this.querySelectorAll(_attr + '[data-l1key="' + i + '"][data-l2key="' + j + '"]').jeeValue(_object[i][j])
+          this.querySelectorAll(selector).jeeValue(_object[i][j])
         }
       }
     }
@@ -521,6 +526,8 @@ domUtils.getUrlString = function(params, keys = [], isArray = false) {
   return p
 }
 
+
+
 domUtils.ajax = function(_params) {
   _params.global = isset(_params.global) ? _params.global : domUtils.ajaxSettings.global
   _params.async = isset(_params.async) ? _params.async : domUtils.ajaxSettings.async
@@ -555,9 +562,8 @@ domUtils.ajax = function(_params) {
       isJson ? _params.success(JSON.parse(request.responseText)) : _params.success(request.responseText)
     } else { //Weird thing happened
       if (_params.global) domUtils.DOMloading -= 1
-      domUtils.handleAjaxError(response, response.status, response.statusText)
-      if (_params.onError) _params.onError(error)
-      _params.onError('', '', error)
+      domUtils.handleAjaxError(request, request.status, request.responseText)
+      if (_params.onError) _params.onError(request)
     }
     _params.complete()
   } else { //Asynchronous request:
@@ -573,6 +579,7 @@ domUtils.ajax = function(_params) {
       referrerPolicy: 'no-referrer',
       mode: 'cors',
       credentials: 'same-origin',
+	    signal: domUtils.controller.signal,
       //Safari AbortSignal.timeout not a function
       //signal: (_params.url == 'core/ajax/event.ajax.php' && _params.data.action == 'changes') ? null : AbortSignal.timeout(10000) //changes polling!
     })
@@ -595,6 +602,9 @@ domUtils.ajax = function(_params) {
         return
       })
       .catch(error => {
+        if(domUtils.controller.signal.aborted){
+          return;
+        }  
         if (_params.global) domUtils.DOMloading -= 1
         if (typeof error.text === 'function') { //Catched from fetch return
           error.text().then(errorMessage => {

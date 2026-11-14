@@ -55,8 +55,9 @@ function initEquipment(_object_id) {
           if (isset(objects[i].configuration) && isset(objects[i].configuration.parentNumber)) {
             decay = objects[i].configuration.parentNumber
           }
+          let name = (objects[i].configuration.display_name && objects[i].configuration.display_name != '') ? objects[i].configuration.display_name : objects[i].name;
           li += '<li><a href="#" class="link" data-page="equipment" data-title="' + icon.replace(/\"/g, "\'") + ' ' + objects[i].name + '" data-option="' + objects[i].id + '">'
-          li += '<span>' + '&nbsp;&nbsp;'.repeat(decay) + icon + '</span> ' + objects[i].name
+          li += '<span>' + '&nbsp;&nbsp;'.repeat(decay) + icon + '</span> ' + name
           li += ' <span class="summaryMenu"><span class="objectSummaryContainer objectSummary'+objects[i].id+'" data-version="mobile"></span></span></a></li>'
           summaries.push({object_id : objects[i].id})
         }
@@ -134,9 +135,6 @@ function initEquipment(_object_id) {
       }
     })
     document.querySelectorAll('.objectHtml').forEach(_div => { Packery.data(_div).layout() })
-    setTimeout(function () {
-       document.querySelectorAll('.objectHtml').forEach(_div => { Packery.data(_div).layout() })
-    }, 1000);
     $('.objectHtml').each(function() {
       let count = $(this).find('.scenario-widget:visible').length + $(this).find('.eqLogic-widget:visible').length
       if (count == 0) {
@@ -211,9 +209,6 @@ function displayEqsByObject(objects_info, _objectId, _summary) {
     complete: function() {
       jeedomUtils.hideLoading()
       window.triggerEvent('resize')
-      setTimeout(function () {
-      window.triggerEvent('resize')
-    }, 500);
     }
   })
 }

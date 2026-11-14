@@ -19,34 +19,77 @@
 /* * ***************************Includes********************************* */
 require_once __DIR__ . '/../../core/php/core.inc.php';
 
+/**
+ * Handles AJAX responses in Jeedom
+ *
+ * @example
+ * ajax::init(['getInfos']); // returns void
+ * ajax::success(['result' => 'ok']); // sends JSON response
+ *
+ * @see config::class For configuration management
+ * @see log::class For logging management
+ */
 class ajax {
 	/*     * *************************Attributs****************************** */
-	
+
 	/*     * *********************Methode static ************************* */
-	
+
+    /**
+     * Initializes AJAX response with HTTP headers and GET action validation
+     *
+     * @param string[] $_allowGetAction List of allowed GET actions
+     * @return void
+     * @throws \Exception When requested GET action is not allowed
+     */
 	public static function init($_allowGetAction = array()) {
 		if (!headers_sent()) {
 			header('Content-Type: application/json');
 		}
 		if(isset($_GET['action']) && !in_array($_GET['action'], $_allowGetAction)){
-			throw new \Exception(__('Méthode non autorisé en GET : ',__FILE__).$_GET['action']);
+			throw new \Exception(__('Méthode non autorisée en GET : ',__FILE__).$_GET['action']);
 		}
 	}
-	
+
+    /**
+     * Returns authentication token
+     *
+     * @deprecated Since version 4.4, authentication is handled differently
+     * @return string Empty token
+     */
 	public static function getToken(){
 		return '';
 	}
-	
+
+    /**
+     * Sends a success response and ends execution
+     *
+     * @param mixed $_data Data to send in response
+     * @return never
+     */
 	public static function success($_data = '') {
 		echo self::getResponse($_data);
 		die();
 	}
-	
+
+    /**
+     * Sends an error response and ends execution
+     *
+     * @param mixed $_data Error message or data to send
+     * @param int $_errorCode Custom error code for client-side handling (default: 0)
+     * @return never
+     */
 	public static function error($_data = '', $_errorCode = 0) {
 		echo self::getResponse($_data, $_errorCode);
 		die();
 	}
-	
+
+    /**
+     * Generates formatted JSON response
+     *
+     * @param mixed $_data Data to include in response
+     * @param ?int $_errorCode Error code (null for success response)
+     * @return string|false Encoded JSON response
+     */
 	public static function getResponse($_data = '', $_errorCode = null) {
 		$isError = !(null === $_errorCode);
 		$return = array(
@@ -56,7 +99,7 @@ class ajax {
 		if ($isError) {
 			$return['code'] = $_errorCode;
 		}
-		return json_encode($return, JSON_UNESCAPED_UNICODE);
+		return json_encode($return, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 	}
 	/*     * **********************Getteur Setteur*************************** */
 }

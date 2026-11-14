@@ -12,7 +12,7 @@ These commands can be obtained by :
 
 The value of interactions lies in the simplified integration into other systems such as smartphones, tablets, other home automation boxes, etc.
 
-> **Tip**
+> **Advice**
 >
 > You can open an interaction by doing :
 > - Click on one of them.
@@ -30,11 +30,11 @@ Once on the configuration of an interaction, you have a contextual menu with the
 
 At the top of the page, there are 3 buttons :
 
-- **To add** : Allows you to create new interactions.
+- **Add** : Allows you to create new interactions.
 - **Regenerate** : Recréer toutes les interactions (peut être très long &gt; 5mn).
 - **Test** : Open a dialog to write and test a sentence.
 
-> **Tip**
+> **Advice**
 >
 > If you have an interaction that generates sentences for lights for example and you add a new light control module, you will either have to regenerate all the interactions, or go to the interaction in question and save it again to create the sentences of this new module.
 
@@ -51,15 +51,15 @@ We can also define a command to execute if for example the interaction is not li
 The configuration page consists of several tabs and buttons :
 
 - **Sentences** : Displays the number of sentences of the interaction (a click on them shows you).
-- **To register** : Record the current interaction.
-- **To delete** : Delete current interaction.
+- **Save** : Record the current interaction.
+- **DELETE** : Delete current interaction.
 - **Duplicate** : Duplicates the current interaction.
 
 ### General tab
 
-- **Last name** : Interaction name (can be empty, the name replaces the request text in the interaction list).
+- **Name** : Interaction name (can be empty, the name replaces the request text in the interaction list).
 - **Band** : Interaction group, this allows to organize them (can be empty, will therefore be in the group "none").
-- **Asset** : Enables or disables interaction.
+- **Active** : Enables or disables interaction.
 - **Request** : The generating model sentence (required).
 - **Synonymous** : Allows to define synonyms on the names of the commands.
 - **Reply** : The answer to provide.
@@ -103,7 +103,7 @@ We can very well imagine doing the same with several actions to light several la
 
 In the 2 examples above, the model sentence is identical but the actions which result from it change according to what is configured in the "Action" part, we can therefore already with a simple interaction with a single sentence imagine actions combined between various commands and various scenarios (we can also trigger scenarios in the action part of interactions).
 
-> **Tip**
+> **Advice**
 >
 > To add a scenario, create a new action, write &quot;scenario&quot; without an accent, press the tab key on your keyboard to bring up the scenario selector.
 
@@ -111,7 +111,7 @@ In the 2 examples above, the model sentence is identical but the actions which r
 
 Here we will see all the interest and all the power of interactions, with a model sentence we will be able to generate sentences for a whole group of commands.
 
-We will resume what was done above, delete the actions that we had added, and instead of the fixed sentence, in &quot;Request&quot;, we will use the tags **\#commande\#** and **\#equipement\#**. Jeedom will therefore replace these tags with the name of the commands and the name of the equipment (we can see the importance of having consistent command / equipment names).
+We will resume what was done above, delete the actions that we had added, and instead of the fixed sentence, in &quot;Request&quot;, we will use the tags **\#commande\#** And **\#equipement\#**. Jeedom will therefore replace these tags with the name of the commands and the name of the equipment (we can see the importance of having consistent command / equipment names).
 
 ![interact006](../images/interact006.png)
 
@@ -242,7 +242,7 @@ In this example we see a simple sentence that will return an answer with 3 diffe
 
 ![interact017](../images/interact017.png)
 
-This example specifically targets specific equipment which allows for a personalized response. So we could imagine replacing the answer of the example with "no there is no one in the room *Julie*\|yes there is someone in the room *Julie*"
+This example specifically targets specific equipment which allows for a personalized response. So we could imagine replacing the answer of the example with "no there is no one in the room *julie*\|yes there is someone in the room *julie*"
 
 #### Evolution
 
@@ -297,7 +297,7 @@ It is possible to control a lamp as a percentage (dimmer) or a thermostat with t
 
 ![interact022](../images/interact022.png)
 
-As we can see, there is here in the request the tag **\#consigne\#** (you can put what you want) which is included in the drive control to apply the desired value. To do this, we have 3 parts : \* Request : in which we create a tag that will represent the value that will be sent to the interaction. \* Reply : we reuse the tag for the response to be sure that Jeedom correctly understood the request. \* Stock : we put an action on the lamp we want to drive and in the value we pass it our tag *order*.
+As we can see, there is here in the request the tag **\#consigne\#** (you can put what you want) which is included in the drive control to apply the desired value. To do this, we have 3 parts : \* Request : in which we create a tag that will represent the value that will be sent to the interaction. \* Reply : we reuse the tag for the response to be sure that Jeedom correctly understood the request. \* Action : we put an action on the lamp we want to drive and in the value we pass it our tag *order*.
 
 > **Note**
 >
