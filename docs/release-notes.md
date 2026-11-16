@@ -1,153 +1,24 @@
-# All changes since release 4.6.1
+# All changes since release 4.2.7
 
 ## New core features
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-10-14 18:19:22 | Redesigned login page | [#3579](https://github.com/jeedom/core/pull/3579) |
-| 2026-10-09 10:20:05 | Implement lost password procedure | [#3519](https://github.com/jeedom/core/pull/3519) |
-| 2026-09-17 18:29:07 | Add input validation and update configuration fields in administratin / security | [#3517](https://github.com/jeedom/core/pull/3517) |
-| 2026-09-14 09:15:53 | feat: Enhance register device management with lifetime configuration | [#3511](https://github.com/jeedom/core/pull/3511) |
-| 2026-09-08 08:58:08 | Feature: add audit log | [#3493](https://github.com/jeedom/core/pull/3493) |
-| 2026-09-04 21:34:21 | Add Debian 13 Trixie compatibility and raises minimum required to Debian 12 | [#3483](https://github.com/jeedom/core/pull/3483) |
-| 2026-09-04 21:28:50 | Update Highstock/Highcharts to 12.6.0 | [#3457](https://github.com/jeedom/core/pull/3457) |
-| 2026-08-27 13:50:54 | Enhance Samba command security with temporary authentication file | [#3475](https://github.com/jeedom/core/pull/3475) |
-| 2026-07-22 10:57:14 | Sync update notification message after each relevant action | [#3410](https://github.com/jeedom/core/pull/3410) |
-| 2026-07-20 19:06:23 | Unify plugin install prompts and revamp the add plugin modal | [#3428](https://github.com/jeedom/core/pull/3428) |
-| 2026-07-17 12:21:21 | Harmonize buttons and icons on the update page | [#3426](https://github.com/jeedom/core/pull/3426) |
-| 2026-07-05 12:36:06 | Recovery use new build-provided product_name for Smart/Atlas | [#3398](https://github.com/jeedom/core/pull/3398) |
-| 2026-06-30 15:36:39 | Uncheck default plugins update | [#3406](https://github.com/jeedom/core/pull/3406) |
-| 2026-06-29 16:12:13 | Add history retention mode | [#3401](https://github.com/jeedom/core/pull/3401) |
-| 2026-06-25 16:40:35 | Update Jeedom logos to new branding | [#3392](https://github.com/jeedom/core/pull/3392) |
-| 2026-06-19 12:09:45 | Update display.php | [#3379](https://github.com/jeedom/core/pull/3379) |
+no entries
 
 ## Breaking changes
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-10-22 10:45:02 | Enhance widget button image handling with validation and security checks | [#3583](https://github.com/jeedom/core/pull/3583) |
-| 2026-10-22 09:07:43 | Fix inconsistent profile check in API access | [#3580](https://github.com/jeedom/core/pull/3580) |
-| 2026-10-15 18:48:03 | Docker: `latest` and standard tags now include MariaDB, `http-` tags no longer do | [#3586](https://github.com/jeedom/core/pull/3586) |
-| 2026-10-14 18:55:15 | Fix duplicated widgets and side positioning in design hover/click zones | [#3572](https://github.com/jeedom/core/pull/3572) |
-| 2026-10-14 18:40:17 | chore: remove display_name configuration from object | [#3566](https://github.com/jeedom/core/pull/3566) |
-| 2026-10-06 15:37:47 | Chore: Remove the OS/package update feature from Jeedom. | [#3514](https://github.com/jeedom/core/pull/3514) |
-| 2026-10-03 08:54:21 | fix: improve battery status handling and messaging | [#3543](https://github.com/jeedom/core/pull/3543) |
-| 2026-09-17 18:22:11 | fix localOnly session and deprecate is_Connected method | [#3520](https://github.com/jeedom/core/pull/3520) |
-| 2026-09-17 16:20:52 | Update Node.js version to 24 and adjust armv6 handling | [#3512](https://github.com/jeedom/core/pull/3512) |
-| 2026-09-01 08:12:25 | migrate password sha512 to php native | [#3476](https://github.com/jeedom/core/pull/3476) |
-| 2026-09-01 08:05:52 | add option to avoid infinite save loops in eqLogic import | [#3471](https://github.com/jeedom/core/pull/3471) |
-| 2026-08-17 12:18:51 | Centralize eqLogic remove confirmation and post-delete redirect | [#3415](https://github.com/jeedom/core/pull/3415) |
-| 2026-06-23 11:57:10 | chore: remove InfluxDB integration | [#3306](https://github.com/jeedom/core/pull/3306) |
+no entries
 
 ## Fixes
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-10-25 19:57:29 | List serial devices only present under /dev/serial/by-id | [#3609](https://github.com/jeedom/core/pull/3609) |
-| 2026-10-24 10:33:37 | Handle OOM killer detection in cgroup v2 environments | [#3595](https://github.com/jeedom/core/pull/3595) |
-| 2026-10-19 21:52:38 | Fix: scenario ajax access | [#3584](https://github.com/jeedom/core/pull/3584) |
-| 2026-10-15 18:48:38 | Increase timeout for backup cloud | [#3546](https://github.com/jeedom/core/pull/3546) |
-| 2026-10-14 18:09:06 | Remove stale update source config keys on source change | [#3575](https://github.com/jeedom/core/pull/3575) |
-| 2026-10-14 18:07:56 | Security fix: packages shell injection | [#3574](https://github.com/jeedom/core/pull/3574) |
-| 2026-10-14 10:38:32 | Security: restrict reading of sensitive config keys to admins (config getKey/removeKey) | [#3576](https://github.com/jeedom/core/pull/3576) |
-| 2026-10-12 18:04:48 | Fix external address showing "http:" after enabling Jeedom DNS on a fresh install | [#3573](https://github.com/jeedom/core/pull/3573) |
-| 2026-10-10 08:30:20 | Stop dmesg errors in logs when the kernel log is unreadable | [#3569](https://github.com/jeedom/core/pull/3569) |
-| 2026-10-09 17:21:56 | Fix OpenVPN and Virtual plugin auto-install failing when they are not enabled | [#3567](https://github.com/jeedom/core/pull/3567) |
-| 2026-10-08 12:50:13 | Restrict the mobile widget modal to admins, like its desktop counterpart | [#3538](https://github.com/jeedom/core/pull/3538) |
-| 2026-10-08 12:33:38 | Show language names in their own language in the language selector | [#3561](https://github.com/jeedom/core/pull/3561) |
-| 2026-10-08 12:26:49 | Open documentation links in the user's language using the new doc site URL format | [#3560](https://github.com/jeedom/core/pull/3560) |
-| 2026-10-08 11:03:30 | Fix: apt usage & add debug level in packages installation | [#3558](https://github.com/jeedom/core/pull/3558) |
-| 2026-10-04 07:28:49 | Fix 2FA QR code display when imagick is not installed | [#3533](https://github.com/jeedom/core/pull/3533) |
-| 2026-10-01 10:07:36 | Make install script work without reboot and clean up its messages | [#3544](https://github.com/jeedom/core/pull/3544) |
-| 2026-10-01 10:06:54 | List every icon shipped with Font Awesome 5.15.4 in the icon selector | [#3545](https://github.com/jeedom/core/pull/3545) |
-| 2026-09-29 09:30:35 | fix: prevent deletion of today's backup when exceeding size limit | [#3542](https://github.com/jeedom/core/pull/3542) |
-| 2026-09-22 19:13:52 | Fix Jeedom cron jobs silently ignored due to insecure cron.d permissions | [#3537](https://github.com/jeedom/core/pull/3537) |
-| 2026-09-22 17:59:35 | Fix crash and boot race when the database isn't ready at startup | [#3536](https://github.com/jeedom/core/pull/3536) |
-| 2026-09-22 17:59:18 | Fix apt/dpkg lock race during installation | [#3535](https://github.com/jeedom/core/pull/3535) |
-| 2026-09-17 18:18:54 | fix(update): throw exception for unavailable source | [#3526](https://github.com/jeedom/core/pull/3526) |
-| 2026-09-17 16:40:21 | Fix visible password input in user management | [#3488](https://github.com/jeedom/core/pull/3488) |
-| 2026-09-12 14:06:09 | Fix Docker Test CI failing for pull requests from forks | [#3513](https://github.com/jeedom/core/pull/3513) |
-| 2026-09-10 08:24:24 | Remove session_id from registeredDevice options in toArray method | [#3507](https://github.com/jeedom/core/pull/3507) |
-| 2026-09-09 18:00:41 | Review user_connect & audit log fine tuning | [#3504](https://github.com/jeedom/core/pull/3504) |
-| 2026-09-08 09:56:11 | Refactor user input handling: add validation and sanitization methods for login and password | [#3500](https://github.com/jeedom/core/pull/3500) |
-| 2026-09-07 10:06:59 | Rework health() diagnostics and fix inconsistent checks | [#3491](https://github.com/jeedom/core/pull/3491) |
-| 2026-09-07 09:59:54 | Fix shared cmd::update value mutation breaking live chart updates | [#3452](https://github.com/jeedom/core/pull/3452) |
-| 2026-09-07 09:56:36 | Fix: Scenario triggers failing when trailing spaces are present | [#3494](https://github.com/jeedom/core/pull/3494) |
-| 2026-09-07 09:56:13 | Fix autoload always loading a plugin's main class file instead of a dedicated one | [#3444](https://github.com/jeedom/core/pull/3444) |
-| 2026-09-07 09:54:16 | Prevent setAxisScales from overriding an active chart zoom | [#3451](https://github.com/jeedom/core/pull/3451) |
-| 2026-09-07 09:50:02 | Fix NaN comparisons in DataTables column sorting | [#3413](https://github.com/jeedom/core/pull/3413) |
-| 2026-09-07 09:43:33 | Fire a change event on ispin spinners and guard against double init | [#3436](https://github.com/jeedom/core/pull/3436) |
-| 2026-09-07 09:41:00 | Remove useless floatval() cast in history::getHistoryFromCalcul | [#3399](https://github.com/jeedom/core/pull/3399) |
-| 2026-09-07 09:39:32 | Fix setTags() reference error in jeeApi & plan3d | [#3408](https://github.com/jeedom/core/pull/3408) |
-| 2026-09-07 09:37:06 | add duplicate login check on user update | [#3486](https://github.com/jeedom/core/pull/3486) |
-| 2026-09-07 09:36:05 | Fix icon selector search crashing and not filtering object background images | [#3477](https://github.com/jeedom/core/pull/3477) |
-| 2026-09-07 09:31:27 | Fix login page layout | [#3469](https://github.com/jeedom/core/pull/3469) |
-| 2026-09-04 16:12:23 | Security fix: prevent password hash and 2FA secret leakage in user data responses | [#3482](https://github.com/jeedom/core/pull/3482) |
-| 2026-09-02 10:52:02 | Fix history charts on views/designs never showing the continuation-to-now dash | [#3458](https://github.com/jeedom/core/pull/3458) |
-| 2026-08-31 14:59:18 | Refactor user hash regeneration to avoid double save side effects | [#3470](https://github.com/jeedom/core/pull/3470) |
-| 2026-08-20 13:27:53 | Simplify OpenVPN and virtual plugin auto-install checks | [#3454](https://github.com/jeedom/core/pull/3454) |
-| 2026-08-18 20:06:11 | Fix stale dashed tail not clearing on live history chart update | [#3456](https://github.com/jeedom/core/pull/3456) |
-| 2026-08-15 17:41:40 | Restore unreachable error handling when plugin::byId can't find a plugin | [#3455](https://github.com/jeedom/core/pull/3455) |
-| 2026-07-30 14:10:24 | Fix real-time graph updates: skip inconsistent cases and rescale the Y axis | [#3437](https://github.com/jeedom/core/pull/3437) |
-| 2026-07-30 12:27:42 | Remove stale mistranslated German "Batterie" translation | [#3448](https://github.com/jeedom/core/pull/3448) |
-| 2026-07-27 17:04:17 | Fix widget size (zoom) breaking grid snap and containment in the design editor | [#3441](https://github.com/jeedom/core/pull/3441) |
-| 2026-07-27 17:02:48 | Fix resize stop callback not firing | [#3439](https://github.com/jeedom/core/pull/3439) |
-| 2026-07-27 16:35:09 | Sanitize dynamic tooltip content before rendering it as HTML | [#3440](https://github.com/jeedom/core/pull/3440) |
-| 2026-07-24 14:08:25 | Fix transformations and pie chart handling on real-time history graph updates | [#3434](https://github.com/jeedom/core/pull/3434) |
-| 2026-07-22 18:33:00 | Fire real click/change events when toggling checkboxes via the context menu | [#3427](https://github.com/jeedom/core/pull/3427) |
-| 2026-07-22 10:55:38 | Scope clearToasts to the dialog being closed | [#3414](https://github.com/jeedom/core/pull/3414) |
-| 2026-07-22 10:52:07 | Fix setTags() reference error in interactQuery | [#3407](https://github.com/jeedom/core/pull/3407) |
-| 2026-07-22 10:51:13 | Fix plugin custom events never reaching native addEventListener listeners | [#3416](https://github.com/jeedom/core/pull/3416) |
-| 2026-07-22 10:44:28 | Always place the cancel button before confirm in jeeDialog footers | [#3423](https://github.com/jeedom/core/pull/3423) |
-| 2026-07-22 10:43:46 | Avoid config pollution when a plugin lookup fails on a non-existent id | [#3421](https://github.com/jeedom/core/pull/3421) |
-| 2026-07-17 16:29:00 | Fix broken translations on the update page | [#3431](https://github.com/jeedom/core/pull/3431) |
-| 2026-07-16 09:33:46 | Harmonize wording of selection modal titles | [#3424](https://github.com/jeedom/core/pull/3424) |
-| 2026-06-30 11:29:16 | Prevent recording uppercase status in update database | [#3405](https://github.com/jeedom/core/pull/3405) |
-| 2026-06-25 13:40:05 | fix in case pdo hydratation set timeout to null | [#3393](https://github.com/jeedom/core/pull/3393) |
-| 2026-06-25 13:39:19 | fix in case pdo hydratation set timeout to null | [#3395](https://github.com/jeedom/core/pull/3395) |
-| 2026-06-23 11:10:53 | Fix missing translations in cmd.configure modal | [#3384](https://github.com/jeedom/core/pull/3384) |
+no entries
 
 ## Others
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-09-10 09:59:13 | Chore: Update PHP version checks to require PHP 7.4 or higher | [#3509](https://github.com/jeedom/core/pull/3509) |
-| 2026-09-07 09:48:19 | Chore: clean useless filter | [#3450](https://github.com/jeedom/core/pull/3450) |
-| 2026-09-07 09:45:59 | Remove dead widget plugin template lookup | [#3447](https://github.com/jeedom/core/pull/3447) |
-| 2026-09-04 21:38:24 | Fix hardcoded result property and incorrect options variable | [#3487](https://github.com/jeedom/core/pull/3487) |
-| 2026-08-18 20:15:41 | Make plugin::byId/isInstalled cache handling and full parameter typing explicit | [#3453](https://github.com/jeedom/core/pull/3453) |
-| 2026-08-17 13:33:18 | incorrect translation | [#3463](https://github.com/jeedom/core/pull/3463) |
-| 2026-07-30 14:11:05 | Speed up plugin::isInstalled and use it instead of byId for existence checks | [#3446](https://github.com/jeedom/core/pull/3446) |
-| 2026-07-22 10:45:14 | Modernize Element.prototype.empty using replaceChildren | [#3417](https://github.com/jeedom/core/pull/3417) |
-| 2026-06-27 21:01:28 | Use guard clauses in cmd->addHistoryValue | [#3400](https://github.com/jeedom/core/pull/3400) |
-| 2026-06-23 11:59:28 | patch: remove nginx support | [#3376](https://github.com/jeedom/core/pull/3376) |
+no entries
 
 ## Documentations
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-10-04 09:16:21 | Update instructions for clarity and accuracy | [#3551](https://github.com/jeedom/core/pull/3551) |
-| 2026-09-25 16:15:34 | Harmonize the CI status badge in the READMEs | [#3541](https://github.com/jeedom/core/pull/3541) |
-| 2026-09-14 19:57:17 | Fix broken lightbox image paths in doc pages | [#3523](https://github.com/jeedom/core/pull/3523) |
-| 2026-09-14 18:57:16 | Remove obsolete and mismatched documentation files | [#3522](https://github.com/jeedom/core/pull/3522) |
-| 2026-09-14 15:22:49 | Rework documentation: bilingual README, fixed broken links/images, dropped pt_PT | [#3515](https://github.com/jeedom/core/pull/3515) |
-| 2026-09-10 14:42:25 | Add automated documentation translation and publishing workflow | [#3460](https://github.com/jeedom/core/pull/3460) |
-| 2026-07-16 09:18:32 | 2 wording corrections in Objects documentation (object.md) | [#3422](https://github.com/jeedom/core/pull/3422) |
+no entries
 
 ## Developer
-| Merge date | Title | PR |
-| --- | --- | --- |
-| 2026-10-22 10:45:36 | update release notes workflow to create PR | [#3603](https://github.com/jeedom/core/pull/3603) |
-| 2026-10-22 10:11:39 | chore: bump version to 4.6.3 | [#3601](https://github.com/jeedom/core/pull/3601) |
-| 2026-10-22 09:40:45 | chore: update migration script for Debian 13 to 4.6.3 to avoid confli… | [#3597](https://github.com/jeedom/core/pull/3597) |
-| 2026-10-21 14:59:35 | chore: update PHP and Symfony version constraints in composer.json | [#3591](https://github.com/jeedom/core/pull/3591) |
-| 2026-09-25 13:30:53 | Chore: clean workflow | [#3530](https://github.com/jeedom/core/pull/3530) |
-| 2026-09-07 09:36:53 | Drop bullseye from CI and Docker Hub build matrices | [#3492](https://github.com/jeedom/core/pull/3492) |
-| 2026-09-01 10:51:55 | Refactor draft release notes workflow to remove tag date retrieval and improve PR fetching logic | [#3481](https://github.com/jeedom/core/pull/3481) |
-| 2026-09-01 08:55:47 | Merge back to develop hotfix 4.6.1 | [#3480](https://github.com/jeedom/core/pull/3480) |
-| 2026-08-18 08:21:10 | Remove PHP 7.3 workflow from GitHub Actions | [#3465](https://github.com/jeedom/core/pull/3465) |
-| 2026-07-01 18:15:21 | chore(deps): bump actions/checkout from 6 to 7 | [#3412](https://github.com/jeedom/core/pull/3412) |
-| 2026-07-01 18:14:57 | chore(deps): bump actions/cache from 5 to 6 | [#3411](https://github.com/jeedom/core/pull/3411) |
-| 2026-06-26 16:47:36 | Remove V4-stable-update workflow | [#3397](https://github.com/jeedom/core/pull/3397) |
-| 2026-06-23 14:25:02 | chore: merge back release to develop | [#3386](https://github.com/jeedom/core/pull/3386) |
+no entries
 
 ## Uncategorized
 | Merge date | Title | PR |
 | --- | --- | --- |
-| 2026-10-22 09:49:53 | Merge back Master to develop after hotfix | [#3598](https://github.com/jeedom/core/pull/3598) |
-| 2026-10-21 18:26:19 | [Security] Atténuer partiellement les CVE PHP sans changer PHP | [#3594](https://github.com/jeedom/core/pull/3594) |
+| 2026-11-14 20:07:33 | Alpha | [#1](https://github.com/aofc/core/pull/1) |
